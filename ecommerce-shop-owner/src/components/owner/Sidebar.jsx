@@ -3,6 +3,8 @@ import React from 'react';
 const Sidebar = () => {
   return (
     <aside className="sidebar">
+
+      
       <h1>Owner Panel</h1>
       <nav>
         <a href="#">Dashboard</a>
@@ -13,5 +15,7 @@ const Sidebar = () => {
     </aside>
   );
 };
+
+
 
 export default Sidebar;
