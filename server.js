@@ -7,18 +7,37 @@ dotenv.config();
 
 const app = express();
 
-// Connect to MongoDB
+// =========================
+// DATABASE CONNECTION
+// =========================
 connectDB();
 
-// Middleware
+// =========================
+// MIDDLEWARE
+// =========================
 app.use(cors());
 app.use(express.json());
 
-// Test route
+// =========================
+// AUTH ROUTES
+// =========================
+const authRoutes = require("./routes/authRoutes");
+
+app.use("/api/auth", authRoutes);
+
+// =========================
+// TEST ROUTE
+// =========================
 app.get("/", (req, res) => {
-    res.send("Shop Sathi Backend is running!");
+    res.json({
+        success: true,
+        message: "Shop Sathi Backend is running!"
+    });
 });
 
+// =========================
+// SERVER
+// =========================
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
