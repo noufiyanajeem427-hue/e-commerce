@@ -17,7 +17,7 @@ const router = express.Router();
 // Register
 router.post("/register", registerUser);
 
-// Login
+//Login
 router.post("/login", loginUser);
 
 // Get current logged-in user
