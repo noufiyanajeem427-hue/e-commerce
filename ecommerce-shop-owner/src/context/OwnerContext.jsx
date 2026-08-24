@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState } from 'react';
 
 const OwnerContext = createContext();
 
+
+
 export const OwnerProvider = ({ children }) => {
   const [store, setStore] = useState({
     name: 'My Shop',
