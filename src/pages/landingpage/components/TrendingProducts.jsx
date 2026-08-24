@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Star, Plus, Flame } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const categories = ['All', 'Laptops', 'Mobiles', 'Audio', 'Cameras', 'Gaming'];
 
@@ -72,7 +73,7 @@ export default function TrendingProducts({ onViewAll }) {
   const filteredProducts = activeCategory === 'All'
     ? products
     : products.filter(p => p.category === activeCategory);
-
+  const navigate = useNavigate();
   return (
     <section className="py-6 px-4 bg-slate-50 max-w-7xl mx-auto">
       {/* Header */}
@@ -80,8 +81,9 @@ export default function TrendingProducts({ onViewAll }) {
         <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
           <Flame className="w-5 h-5 text-amber-500 fill-amber-500" /> Trending Products
         </h2>
+        {/* Navigate on click */}
         <button 
-          onClick={onViewAll} 
+          onClick={() => navigate('/trending-products')} 
           className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 hover:underline transition"
         >
           View All →
