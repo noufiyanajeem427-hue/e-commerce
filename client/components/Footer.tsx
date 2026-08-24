@@ -144,12 +144,13 @@ export const Footer: React.FC = () => {
 
             <div className="space-y-3">
               <h5 className="font-bold text-white uppercase tracking-wider text-[11px]">
-                Help & Legal
+                Account & Help
               </h5>
               <ul className="space-y-2">
+                <li><a href="/login" className="hover:text-amber-400 transition text-amber-400/90 font-semibold">Sign In to Account</a></li>
+                <li><a href="/register" className="hover:text-amber-400 transition text-indigo-400 font-semibold">Join VIP Membership</a></li>
                 <li><a href="#" className="hover:text-amber-400 transition">Order Tracking</a></li>
                 <li><a href="#" className="hover:text-amber-400 transition">Shipping Policy</a></li>
-                <li><a href="#" className="hover:text-amber-400 transition">Returns & Refunds</a></li>
                 <li><a href="#" className="hover:text-amber-400 transition">Privacy Policy</a></li>
                 <li><a href="#" className="hover:text-amber-400 transition">Terms of Service</a></li>
               </ul>

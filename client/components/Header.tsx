@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import {
   ShoppingBag,
   Heart,
   Search,
-  User,
+  User as UserIcon,
   Menu,
   X,
   Sparkles,
@@ -14,18 +15,41 @@ import {
   Percent,
   CheckCircle,
   TrendingUp,
+  LogOut,
+  Crown,
+  ChevronDown,
+  ShieldCheck,
+  UserPlus,
+  LogIn,
+  Package,
 } from "lucide-react";
 import { useShop } from "../context/ShopContext";
+import { useAuth } from "../context/AuthContext";
 import { HIGHEST_VIEWED_PRODUCTS, TRENDING_PRODUCTS, RANDOM_PRODUCTS } from "../data/products";
 import { Product, Currency } from "../types";
 
 export const Header: React.FC = () => {
-  const { totalCartCount, totalCartPriceUSD, wishlist, setIsCartOpen, setQuickViewProduct, currency, setCurrency, formatPrice } = useShop();
+  const {
+    totalCartCount,
+    totalCartPriceUSD,
+    wishlist,
+    setIsCartOpen,
+    setQuickViewProduct,
+    currency,
+    setCurrency,
+    formatPrice,
+  } = useShop();
+
+  const { user, isAuthenticated, logout } = useAuth();
+
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+
   const searchRef = useRef<HTMLDivElement>(null);
+  const userDropdownRef = useRef<HTMLDivElement>(null);
 
   const allProducts: Product[] = [
     ...HIGHEST_VIEWED_PRODUCTS,
@@ -34,11 +58,13 @@ export const Header: React.FC = () => {
   ];
 
   const filteredProducts = searchQuery.trim()
-    ? allProducts.filter(
-        (p) =>
-          p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          p.category.toLowerCase().includes(searchQuery.toLowerCase())
-      ).slice(0, 5)
+    ? allProducts
+        .filter(
+          (p) =>
+            p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            p.category.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+        .slice(0, 5)
     : [];
 
   useEffect(() => {
@@ -53,6 +79,9 @@ export const Header: React.FC = () => {
     const handleClickOutside = (e: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
         setIsSearchFocused(false);
+      }
+      if (userDropdownRef.current && !userDropdownRef.current.contains(e.target as Node)) {
+        setUserDropdownOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -76,6 +105,19 @@ export const Header: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-4 text-zinc-300 text-[11px]">
+            {isAuthenticated && user ? (
+              <span className="hidden sm:flex items-center gap-1 text-amber-400 font-semibold">
+                <Crown className="w-3 h-3" /> Hi, {user.name.split(" ")[0]} ({user.tier})
+              </span>
+            ) : (
+              <Link
+                href="/login"
+                className="hidden sm:flex items-center gap-1 text-zinc-300 hover:text-amber-400 transition"
+              >
+                <LogIn className="w-3 h-3 text-amber-400" /> Member Sign In (20% Off)
+              </Link>
+            )}
+
             <span className="hidden md:flex items-center gap-1 hover:text-white transition cursor-pointer">
               <PhoneCall className="w-3 h-3 text-indigo-400" /> Support: +1 (800) 888-LUXE
             </span>
@@ -105,7 +147,7 @@ export const Header: React.FC = () => {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
           {/* Brand Logo */}
-          <a href="#" className="flex items-center gap-2.5 group">
+          <Link href="/" className="flex items-center gap-2.5 group">
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-amber-500 flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform duration-300">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
@@ -117,7 +159,7 @@ export const Header: React.FC = () => {
                 Artisanal Store
               </span>
             </div>
-          </a>
+          </Link>
 
           {/* Search Bar with Autocomplete Dropdown */}
           <div ref={searchRef} className="relative flex-1 max-w-lg hidden md:block">
@@ -208,8 +250,122 @@ export const Header: React.FC = () => {
             )}
           </div>
 
-          {/* Quick Actions (Wishlist, Cart) */}
-          <div className="flex items-center gap-3">
+          {/* Quick Actions (User Auth, Wishlist, Cart) */}
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            {/* User Profile / Auth Button */}
+            <div ref={userDropdownRef} className="relative">
+              {isAuthenticated && user ? (
+                <button
+                  onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                  className="flex items-center gap-2 p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 transition group"
+                >
+                  <img
+                    src={user.avatar}
+                    alt={user.name}
+                    className="w-7 h-7 rounded-lg object-cover border border-amber-500/40"
+                  />
+                  <div className="hidden lg:flex flex-col text-left">
+                    <span className="text-[11px] font-bold text-white leading-tight truncate max-w-[90px]">
+                      {user.name.split(" ")[0]}
+                    </span>
+                    <span className="text-[9px] font-extrabold text-amber-400 leading-none">
+                      {user.tier}
+                    </span>
+                  </div>
+                  <ChevronDown className="w-3.5 h-3.5 text-zinc-400 hidden sm:block group-hover:text-white transition" />
+                </button>
+              ) : (
+                <div className="flex items-center gap-1.5">
+                  <Link
+                    href="/login"
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-200 hover:text-amber-400 border border-zinc-800 text-xs font-semibold transition group"
+                  >
+                    <UserIcon className="w-4 h-4 text-zinc-400 group-hover:text-amber-400 transition" />
+                    <span className="hidden sm:inline">Sign In</span>
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="hidden lg:flex items-center gap-1 px-3 py-2 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-xs font-semibold transition"
+                  >
+                    <UserPlus className="w-3.5 h-3.5" />
+                    <span>Register</span>
+                  </Link>
+                </div>
+              )}
+
+              {/* User Dropdown Menu */}
+              {userDropdownOpen && isAuthenticated && user && (
+                <div className="absolute right-0 mt-2 w-64 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden z-50 p-2 animate-in fade-in slide-in-from-top-2 duration-150">
+                  <div className="p-3 bg-zinc-950/70 rounded-xl border border-zinc-800/80 mb-2">
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={user.avatar}
+                        alt={user.name}
+                        className="w-10 h-10 rounded-xl object-cover border border-amber-500/40"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-bold text-white truncate">{user.name}</p>
+                        <p className="text-[10px] text-zinc-400 truncate">{user.email}</p>
+                        <span className="inline-block mt-1 text-[9px] font-extrabold px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                          {user.tier}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1 text-xs">
+                    <a
+                      href="#highest-viewed"
+                      onClick={() => setUserDropdownOpen(false)}
+                      className="flex items-center justify-between p-2 rounded-lg hover:bg-zinc-800 text-zinc-300 hover:text-white transition"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Heart className="w-4 h-4 text-rose-400" />
+                        <span>My Wishlist</span>
+                      </div>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400 font-bold">
+                        {wishlist.length}
+                      </span>
+                    </a>
+
+                    <button
+                      onClick={() => {
+                        setUserDropdownOpen(false);
+                        setIsCartOpen(true);
+                      }}
+                      className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-zinc-800 text-zinc-300 hover:text-white transition text-left"
+                    >
+                      <div className="flex items-center gap-2">
+                        <ShoppingBag className="w-4 h-4 text-amber-400" />
+                        <span>Active Cart</span>
+                      </div>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400 font-bold">
+                        {totalCartCount} items
+                      </span>
+                    </button>
+
+                    <div className="p-2 text-[11px] bg-indigo-950/40 rounded-lg border border-indigo-500/20 text-indigo-300 flex items-center gap-2">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                      <span>20% Member Coupon: LUXE20</span>
+                    </div>
+
+                    <div className="border-t border-zinc-800 my-1" />
+
+                    <button
+                      onClick={() => {
+                        logout();
+                        setUserDropdownOpen(false);
+                      }}
+                      className="w-full flex items-center gap-2 p-2 rounded-lg hover:bg-rose-500/10 text-rose-400 hover:text-rose-300 transition text-left font-semibold"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span>Sign Out</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Wishlist Button */}
             <a
               href="#highest-viewed"
@@ -252,6 +408,75 @@ export const Header: React.FC = () => {
             </button>
           </div>
         </div>
+
+        {/* Mobile Expanded Menu Drawer */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t border-zinc-800 bg-zinc-950 p-4 space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
+            {/* Mobile Search */}
+            <div className="relative">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search products..."
+                className="w-full bg-zinc-900 border border-zinc-800 text-zinc-100 placeholder-zinc-500 text-xs rounded-xl pl-10 pr-4 py-2.5 outline-none focus:border-indigo-500"
+              />
+              <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            </div>
+
+            {/* Mobile Auth Actions */}
+            <div className="p-3 bg-zinc-900/80 rounded-2xl border border-zinc-800 space-y-3">
+              {isAuthenticated && user ? (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <img src={user.avatar} alt={user.name} className="w-10 h-10 rounded-xl object-cover border border-amber-500/40" />
+                    <div>
+                      <p className="text-xs font-bold text-white">{user.name}</p>
+                      <p className="text-[10px] text-zinc-400">{user.email}</p>
+                      <span className="text-[9px] font-bold text-amber-400">{user.tier}</span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      logout();
+                      setMobileMenuOpen(false);
+                    }}
+                    className="w-full py-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-bold rounded-xl border border-rose-500/20 transition flex items-center justify-center gap-2"
+                  >
+                    <LogOut className="w-3.5 h-3.5" /> Sign Out
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-2">
+                  <Link
+                    href="/login"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="py-2.5 px-3 bg-zinc-800 hover:bg-zinc-700 text-center text-xs font-bold text-white rounded-xl transition flex items-center justify-center gap-1.5"
+                  >
+                    <LogIn className="w-3.5 h-3.5 text-amber-400" /> Sign In
+                  </Link>
+                  <Link
+                    href="/register"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="py-2.5 px-3 bg-amber-500 hover:bg-amber-400 text-center text-xs font-extrabold text-black rounded-xl transition flex items-center justify-center gap-1.5"
+                  >
+                    <UserPlus className="w-3.5 h-3.5" /> Register
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            {/* Navigation links */}
+            <div className="grid grid-cols-2 gap-2 text-xs font-medium text-zinc-300">
+              <a href="#hero-slider" onClick={() => setMobileMenuOpen(false)} className="p-2.5 bg-zinc-900 rounded-xl hover:text-amber-400">Featured Drops</a>
+              <a href="#categories-section" onClick={() => setMobileMenuOpen(false)} className="p-2.5 bg-zinc-900 rounded-xl hover:text-amber-400">Categories</a>
+              <a href="#highest-viewed" onClick={() => setMobileMenuOpen(false)} className="p-2.5 bg-zinc-900 rounded-xl hover:text-amber-400">Most Viewed 🔥</a>
+              <a href="#trending-section" onClick={() => setMobileMenuOpen(false)} className="p-2.5 bg-zinc-900 rounded-xl hover:text-amber-400">Trending Now</a>
+              <a href="#discount-slider" onClick={() => setMobileMenuOpen(false)} className="p-2.5 bg-zinc-900 rounded-xl text-rose-400 font-bold">Flash Sales %</a>
+              <a href="#random-products" onClick={() => setMobileMenuOpen(false)} className="p-2.5 bg-zinc-900 rounded-xl hover:text-amber-400">Discover Random</a>
+            </div>
+          </div>
+        )}
 
         {/* Secondary Category Navigation Bar */}
         <div className="hidden md:block border-t border-zinc-800/60 mt-3 pt-2.5 pb-0.5">
