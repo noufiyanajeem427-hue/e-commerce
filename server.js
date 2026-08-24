@@ -19,11 +19,13 @@ app.use(cors());
 app.use(express.json());
 
 // =========================
-// AUTH ROUTES
+// ROUTES
 // =========================
 const authRoutes = require("./routes/authRoutes");
+const productRoutes = require("./routes/productRoutes");
 
 app.use("/api/auth", authRoutes);
+app.use("/api/products", productRoutes);
 
 // =========================
 // TEST ROUTE
