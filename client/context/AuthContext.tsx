@@ -8,7 +8,7 @@ export interface User {
   name: string;
   email: string;
   avatar: string;
-  role: "user" | "admin" | "vip";
+  role: "user" | "admin";
   tier: "Standard" | "Gold VIP" | "Diamond VIP";
   joinedDate: string;
   ordersCount: number;
@@ -21,28 +21,18 @@ interface AuthContextType {
   login: (email: string, password?: string) => Promise<boolean>;
   register: (name: string, email: string, password?: string) => Promise<boolean>;
   logout: () => void;
-  demoLogin: (type: "vip" | "admin" | "user") => void;
+  demoLogin: (type: "admin" | "user") => void;
   updateProfile: (updatedData: Partial<User>) => void;
 }
 
-const DEMO_USERS: Record<"vip" | "admin" | "user", User> = {
-  vip: {
-    id: "usr_vip_8841",
-    name: "Alexander Wright",
-    email: "alexander.vip@luxecart.com",
-    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-    role: "vip",
-    tier: "Diamond VIP",
-    joinedDate: "October 2024",
-    ordersCount: 14,
-  },
+const DEMO_USERS: Record<"admin" | "user", User> = {
   admin: {
     id: "usr_adm_0001",
     name: "Elena Rostova (Admin)",
     email: "elena.admin@luxecart.com",
     avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80",
     role: "admin",
-    tier: "Diamond VIP",
+    tier: "Standard",
     joinedDate: "January 2024",
     ordersCount: 42,
   },
@@ -52,7 +42,7 @@ const DEMO_USERS: Record<"vip" | "admin" | "user", User> = {
     email: "sophia.chen@example.com",
     avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80",
     role: "user",
-    tier: "Gold VIP",
+    tier: "Standard",
     joinedDate: "February 2026",
     ordersCount: 3,
   },
@@ -103,12 +93,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return false;
     }
 
+    // Demo account password enforcement
+    const isDemoAccount = [
+      DEMO_USERS.admin.email,
+      DEMO_USERS.user.email,
+    ].includes(email.toLowerCase());
+
+    if (isDemoAccount && password !== "password123") {
+      toast.error("Incorrect password. Demo accounts use: password123");
+      setIsLoading(false);
+      return false;
+    }
+
     // Check if it matches a preset or derive a mock user
     let loggedUser: User;
     if (email.toLowerCase().includes("admin")) {
       loggedUser = DEMO_USERS.admin;
-    } else if (email.toLowerCase().includes("alex") || email.toLowerCase().includes("vip")) {
-      loggedUser = DEMO_USERS.vip;
     } else {
       const derivedName = email.split("@")[0].replace(/[._-]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
       loggedUser = {
@@ -117,7 +117,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         email: email.toLowerCase(),
         avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(email)}`,
         role: "user",
-        tier: "Gold VIP",
+        tier: "Standard",
         joinedDate: "Recently Joined",
         ordersCount: 0,
       };
@@ -168,7 +168,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return true;
   };
 
-  const demoLogin = (type: "vip" | "admin" | "user") => {
+  const demoLogin = (type: "admin" | "user") => {
     const selectedUser = DEMO_USERS[type];
     saveUserSession(selectedUser);
     toast.success(`Logged in as ${selectedUser.name} (${selectedUser.tier})`);
