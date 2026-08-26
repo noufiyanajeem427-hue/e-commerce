@@ -22,6 +22,11 @@ import {
   UserPlus,
   LogIn,
   Package,
+  Store,
+  Briefcase,
+  LayoutDashboard,
+  BadgeDollarSign,
+  ArrowRight,
 } from "lucide-react";
 import { useShop } from "../context/ShopContext";
 import { useAuth } from "../context/AuthContext";
@@ -104,11 +109,32 @@ export const Header: React.FC = () => {
             </span>
           </div>
 
-          <div className="flex items-center gap-4 text-zinc-300 text-[11px]">
+          <div className="flex items-center gap-3 sm:gap-4 text-zinc-300 text-[11px]">
             {isAuthenticated && user ? (
-              <span className="hidden sm:flex items-center gap-1 text-amber-400 font-semibold">
-                <Crown className="w-3 h-3" /> Hi, {user.name.split(" ")[0]} ({user.tier})
-              </span>
+              <>
+                <span className="hidden sm:flex items-center gap-1 text-amber-400 font-semibold">
+                  <Crown className="w-3 h-3" /> Hi, {user.name.split(" ")[0]} ({user.tier})
+                </span>
+
+                {/* Become a Seller / Seller Dashboard Link */}
+                {user.isSeller || user.role === "seller" ? (
+                  <Link
+                    href="/seller/dashboard"
+                    className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 font-bold transition"
+                  >
+                    <Store className="w-3 h-3 text-emerald-400" />
+                    <span>Seller Dashboard</span>
+                  </Link>
+                ) : (
+                  <Link
+                    href="/become-seller"
+                    className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-500/20 to-orange-500/20 hover:from-amber-500/30 hover:to-orange-500/30 text-amber-300 border border-amber-500/40 font-bold shadow-sm shadow-amber-500/10 transition animate-pulse"
+                  >
+                    <Briefcase className="w-3 h-3 text-amber-400" />
+                    <span>Become a Seller</span>
+                  </Link>
+                )}
+              </>
             ) : (
               <Link
                 href="/login"
@@ -314,6 +340,48 @@ export const Header: React.FC = () => {
                   </div>
 
                   <div className="space-y-1 text-xs">
+                    {/* Become a Seller / Seller Dashboard Section in Dropdown */}
+                    {user.isSeller || user.role === "seller" ? (
+                      <Link
+                        href="/seller/dashboard"
+                        onClick={() => setUserDropdownOpen(false)}
+                        className="flex items-center justify-between p-2.5 rounded-xl bg-gradient-to-r from-emerald-950/60 to-teal-950/60 hover:from-emerald-900/60 hover:to-teal-900/60 text-emerald-300 border border-emerald-500/30 transition group"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                            <Store className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <p className="font-bold text-white leading-tight">Seller Dashboard</p>
+                            <p className="text-[10px] text-emerald-400">Manage store & products</p>
+                          </div>
+                        </div>
+                        <ArrowRight className="w-3.5 h-3.5 text-emerald-400 group-hover:translate-x-0.5 transition-transform" />
+                      </Link>
+                    ) : (
+                      <Link
+                        href="/become-seller"
+                        onClick={() => setUserDropdownOpen(false)}
+                        className="flex items-center justify-between p-2.5 rounded-xl bg-gradient-to-r from-amber-950/50 via-orange-950/40 to-yellow-950/50 hover:from-amber-900/60 hover:to-orange-900/50 text-amber-200 border border-amber-500/30 shadow-md shadow-amber-500/10 transition group"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center">
+                            <Briefcase className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-1.5">
+                              <span className="font-bold text-white leading-tight">Become a Seller</span>
+                              <span className="text-[9px] bg-amber-400 text-black px-1.5 py-0.2 rounded font-extrabold">NEW</span>
+                            </div>
+                            <p className="text-[10px] text-amber-300/80">Sell & earn on Luxe Cart</p>
+                          </div>
+                        </div>
+                        <ArrowRight className="w-3.5 h-3.5 text-amber-400 group-hover:translate-x-0.5 transition-transform" />
+                      </Link>
+                    )}
+
+                    <div className="border-t border-zinc-800/80 my-1.5" />
+
                     <a
                       href="#highest-viewed"
                       onClick={() => setUserDropdownOpen(false)}
@@ -428,14 +496,36 @@ export const Header: React.FC = () => {
             <div className="p-3 bg-zinc-900/80 rounded-2xl border border-zinc-800 space-y-3">
               {isAuthenticated && user ? (
                 <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <img src={user.avatar} alt={user.name} className="w-10 h-10 rounded-xl object-cover border border-amber-500/40" />
-                    <div>
-                      <p className="text-xs font-bold text-white">{user.name}</p>
-                      <p className="text-[10px] text-zinc-400">{user.email}</p>
-                      <span className="text-[9px] font-bold text-amber-400">{user.tier}</span>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <img src={user.avatar} alt={user.name} className="w-10 h-10 rounded-xl object-cover border border-amber-500/40" />
+                      <div>
+                        <p className="text-xs font-bold text-white">{user.name}</p>
+                        <p className="text-[10px] text-zinc-400">{user.email}</p>
+                        <span className="text-[9px] font-bold text-amber-400">{user.tier}</span>
+                      </div>
                     </div>
                   </div>
+
+                  {/* Become Seller / Seller Dashboard in Mobile */}
+                  {user.isSeller || user.role === "seller" ? (
+                    <Link
+                      href="/seller/dashboard"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="w-full py-2 px-3 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 text-xs font-bold rounded-xl border border-emerald-500/30 transition flex items-center justify-center gap-2"
+                    >
+                      <Store className="w-4 h-4 text-emerald-400" /> Seller Dashboard
+                    </Link>
+                  ) : (
+                    <Link
+                      href="/become-seller"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="w-full py-2.5 px-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black text-xs font-extrabold rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20"
+                    >
+                      <Briefcase className="w-4 h-4" /> Become a Seller (Start Earning)
+                    </Link>
+                  )}
+
                   <button
                     onClick={() => {
                       logout();

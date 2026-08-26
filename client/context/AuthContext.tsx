@@ -3,13 +3,25 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import toast from "react-hot-toast";
 
+export interface SellerInfo {
+  storeName: string;
+  storeCategory: string;
+  businessEmail: string;
+  phone: string;
+  address?: string;
+  bankDetails?: string;
+  joinedAsSellerDate?: string;
+}
+
 export interface User {
   id: string;
   name: string;
   email: string;
   avatar: string;
-  role: "user" | "admin";
-  tier: "Standard" | "Gold VIP" | "Diamond VIP";
+  role: "user" | "seller" | "admin";
+  isSeller?: boolean;
+  sellerInfo?: SellerInfo;
+  tier: "Standard" | "Gold VIP" | "Diamond VIP" | "Seller Pro";
   joinedDate: string;
   ordersCount: number;
 }
@@ -23,6 +35,7 @@ interface AuthContextType {
   logout: () => void;
   demoLogin: (type: "admin" | "user") => void;
   updateProfile: (updatedData: Partial<User>) => void;
+  becomeSeller: (sellerData: SellerInfo) => Promise<boolean>;
 }
 
 const DEMO_USERS: Record<"admin" | "user", User> = {
@@ -186,6 +199,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     toast.success("Profile updated successfully!");
   };
 
+  const becomeSeller = async (sellerData: SellerInfo): Promise<boolean> => {
+    if (!user) {
+      toast.error("Please sign in first to become a seller");
+      return false;
+    }
+
+    setIsLoading(true);
+    await new Promise((resolve) => setTimeout(resolve, 800)); // Simulated processing delay
+
+    const updatedUser: User = {
+      ...user,
+      role: "seller",
+      isSeller: true,
+      tier: "Seller Pro",
+      sellerInfo: {
+        ...sellerData,
+        joinedAsSellerDate: new Date().toLocaleDateString("en-US", {
+          month: "long",
+          year: "numeric",
+        }),
+      },
+    };
+
+    saveUserSession(updatedUser);
+    setIsLoading(false);
+    toast.success(`🎉 Congratulations! Your store "${sellerData.storeName}" is now active!`, {
+      duration: 5000,
+    });
+    return true;
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -197,6 +241,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         logout,
         demoLogin,
         updateProfile,
+        becomeSeller,
       }}
     >
       {children}

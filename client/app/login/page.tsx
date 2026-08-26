@@ -60,13 +60,28 @@ function LoginForm() {
               </span>
             </div>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <button
               onClick={() => router.push(redirectUrl)}
-              className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-bold text-sm transition shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2"
+              className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-bold text-xs transition shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2"
             >
               Continue Shopping <ArrowRight className="w-4 h-4" />
             </button>
+            {user.isSeller ? (
+              <Link
+                href="/seller/dashboard"
+                className="py-3 px-4 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 font-bold text-xs transition flex items-center justify-center gap-1.5"
+              >
+                Seller Dashboard
+              </Link>
+            ) : (
+              <Link
+                href="/become-seller"
+                className="py-3 px-4 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-500/30 font-bold text-xs transition flex items-center justify-center gap-1.5"
+              >
+                Become a Seller
+              </Link>
+            )}
           </div>
         </div>
       </div>
