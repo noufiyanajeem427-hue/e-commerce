@@ -5,54 +5,50 @@ import { CATEGORY_BOXES } from "../data/products";
 import { ArrowRight, Star, ShoppingBag, Heart, Eye, Layers } from "lucide-react";
 import { useShop } from "../context/ShopContext";
 
+import Link from "next/link";
+import { ProductCardMedia } from "./ProductCardMedia";
+
 export const CategoryBoxes: React.FC = () => {
-  const { addToCart, toggleWishlist, isInWishlist, setQuickViewProduct, formatPrice } = useShop();
+  const { addToCart, toggleWishlist, isInWishlist, formatPrice } = useShop();
 
   return (
-    <section id="category-boxes" className="w-full bg-zinc-950 py-12 border-t border-zinc-900">
+    <section id="category-boxes" className="w-full bg-[#0B0F19] py-14 border-t border-white/5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Title */}
+        {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-xs font-bold uppercase tracking-wider mb-2">
-              <Layers className="w-3.5 h-3.5" /> Curated Category Highlights
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-xs font-extrabold uppercase tracking-widest mb-2">
+              <Layers className="w-3.5 h-3.5" /> Curated Collections
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-              Featured Category Showcase (4 Products Each)
+            <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
+              Featured Category Hubs
             </h2>
           </div>
-          <p className="text-xs text-zinc-400 max-w-md">
-            Specially organized category boxes featuring exactly 4 premier products inside each tailored collection block.
+          <p className="text-xs text-slate-400 max-w-md leading-relaxed">
+            Handpicked department collections grouped by luxury aesthetic, tech specs, and modern lifestyle.
           </p>
         </div>
 
-        {/* 4 Category Showcase Containers */}
-        <div className="space-y-12">
+        {/* Category Boxes: 3 columns */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {CATEGORY_BOXES.map((box) => (
             <div
               key={box.id}
-              className="bg-zinc-900/60 border border-zinc-800 rounded-3xl p-6 sm:p-8 relative overflow-hidden shadow-2xl"
+              className="bg-zinc-900/60 border border-zinc-800 rounded-3xl p-5 sm:p-6 shadow-2xl flex flex-col justify-between"
             >
-              {/* Category Box Header */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 mb-6 border-b border-zinc-800 gap-4">
+              {/* Box Header Banner */}
+              <div className="flex items-center justify-between mb-5 pb-4 border-b border-zinc-800">
                 <div>
-                  <h3 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
-                    {box.title}
-                  </h3>
-                  <p className="text-xs text-zinc-400 mt-1">{box.subtitle}</p>
+                  <h3 className="text-lg font-black text-white tracking-tight">{box.title}</h3>
+                  <p className="text-xs text-zinc-400 font-medium mt-0.5">{box.subtitle}</p>
                 </div>
-
-                <a
-                  href="#trending-section"
-                  className="inline-flex items-center gap-2 text-xs font-bold text-amber-400 hover:text-amber-300 bg-amber-500/10 border border-amber-500/20 px-4 py-2 rounded-xl transition"
-                >
-                  Explore All Category Items
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </a>
+                <span className="text-xs font-extrabold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full">
+                  {box.products.length} Items
+                </span>
               </div>
 
-              {/* 4-Product Grid Inside This Category Box */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {/* 4 Products 2x2 Grid */}
+              <div className="grid grid-cols-2 gap-3.5 flex-1">
                 {box.products.map((product) => {
                   const isWish = isInWishlist(product.id);
                   return (
@@ -60,25 +56,23 @@ export const CategoryBoxes: React.FC = () => {
                       key={product.id}
                       className="group bg-zinc-950/80 border border-zinc-800/80 rounded-2xl overflow-hidden hover:border-indigo-500/40 transition-all duration-300 flex flex-col justify-between"
                     >
-                      {/* Product Thumbnail Image */}
-                      <div className="relative aspect-4/3 w-full bg-zinc-900 overflow-hidden">
-                        <img
-                          src={product.image}
-                          alt={product.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent opacity-40" />
-
+                      {/* Product Thumbnail with Long Press Quick View & Single Click Slug */}
+                      <ProductCardMedia product={product} aspectClass="aspect-4/3">
                         {/* Discount Badge */}
                         {product.discountPercentage && (
-                          <span className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-lg bg-emerald-500 text-black text-[10px] font-extrabold shadow-md">
+                          <span className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-lg bg-emerald-500 text-black text-[10px] font-extrabold shadow-md pointer-events-none">
                             -{product.discountPercentage}% OFF
                           </span>
                         )}
 
                         {/* Wishlist Icon */}
                         <button
-                          onClick={() => toggleWishlist(product)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleWishlist(product);
+                          }}
+                          onMouseDown={(e) => e.stopPropagation()}
+                          onTouchStart={(e) => e.stopPropagation()}
                           className={`absolute top-2.5 right-2.5 p-2 rounded-xl backdrop-blur-md border transition z-10 ${
                             isWish
                               ? "bg-rose-500/90 text-white border-rose-400 shadow-md"
@@ -87,15 +81,7 @@ export const CategoryBoxes: React.FC = () => {
                         >
                           <Heart className={`w-3.5 h-3.5 ${isWish ? "fill-white" : ""}`} />
                         </button>
-
-                        {/* Quick View Button */}
-                        <button
-                          onClick={() => setQuickViewProduct(product)}
-                          className="absolute inset-x-3 bottom-2 py-1.5 bg-black/80 backdrop-blur-md text-white text-[11px] font-semibold rounded-lg border border-white/20 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-1 hover:bg-white hover:text-black z-10"
-                        >
-                          <Eye className="w-3 h-3" /> Quick View
-                        </button>
-                      </div>
+                      </ProductCardMedia>
 
                       {/* Product Info */}
                       <div className="p-4 flex-1 flex flex-col justify-between space-y-2">
@@ -105,14 +91,16 @@ export const CategoryBoxes: React.FC = () => {
                               {product.category}
                             </span>
                             <div className="flex items-center gap-1 text-amber-400 font-bold text-[10px]">
-                              <Star className="w-3 h-3 fill-amber-400" />
+                              <Star className="w-3.5 h-3.5 fill-amber-400" />
                               <span>{product.rating}</span>
                             </div>
                           </div>
 
-                          <h4 className="text-xs font-bold text-white group-hover:text-amber-400 transition line-clamp-1">
-                            {product.name}
-                          </h4>
+                          <Link href={`/product/${product.id}`} className="block">
+                            <h4 className="text-xs font-bold text-white hover:text-amber-400 transition line-clamp-1">
+                              {product.name}
+                            </h4>
+                          </Link>
                         </div>
 
                         {/* Price & Add Button */}

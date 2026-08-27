@@ -7,10 +7,13 @@ import { Shuffle, Star, ShoppingBag, Heart, Eye, Sparkles } from "lucide-react";
 import { useShop } from "../context/ShopContext";
 import toast from "react-hot-toast";
 
+import Link from "next/link";
+import { ProductCardMedia } from "./ProductCardMedia";
+
 export const RandomProducts: React.FC = () => {
   const [productsList, setProductsList] = useState<Product[]>(RANDOM_PRODUCTS);
   const [isShuffling, setIsShuffling] = useState(false);
-  const { addToCart, toggleWishlist, isInWishlist, setQuickViewProduct, formatPrice } = useShop();
+  const { addToCart, toggleWishlist, isInWishlist, formatPrice } = useShop();
 
   const handleShuffle = () => {
     setIsShuffling(true);
@@ -65,25 +68,23 @@ export const RandomProducts: React.FC = () => {
                 key={product.id}
                 className="group relative bg-zinc-900/80 border border-zinc-800 rounded-3xl overflow-hidden hover:border-emerald-500/40 transition-all duration-300 shadow-xl flex flex-col justify-between"
               >
-                {/* Image */}
-                <div className="relative aspect-4/3 w-full overflow-hidden bg-zinc-950">
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent opacity-50" />
-
+                {/* Image with Long-Press Quick View & Single Click Slug */}
+                <ProductCardMedia product={product} aspectClass="aspect-4/3">
                   {/* Discount Badge */}
                   {product.discountPercentage && (
-                    <span className="absolute top-3 left-3 px-2 py-0.5 rounded-lg bg-emerald-500 text-black text-[10px] font-extrabold shadow-md">
+                    <span className="absolute top-3 left-3 px-2 py-0.5 rounded-lg bg-emerald-500 text-black text-[10px] font-extrabold shadow-md pointer-events-none">
                       -{product.discountPercentage}% OFF
                     </span>
                   )}
 
                   {/* Wishlist Button */}
                   <button
-                    onClick={() => toggleWishlist(product)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleWishlist(product);
+                    }}
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onTouchStart={(e) => e.stopPropagation()}
                     className={`absolute top-3 right-3 p-2.5 rounded-2xl backdrop-blur-md border transition z-10 ${
                       isWish
                         ? "bg-rose-500/90 text-white border-rose-400 shadow-lg shadow-rose-500/30"
@@ -92,15 +93,7 @@ export const RandomProducts: React.FC = () => {
                   >
                     <Heart className={`w-4 h-4 ${isWish ? "fill-white" : ""}`} />
                   </button>
-
-                  {/* Quick View Button */}
-                  <button
-                    onClick={() => setQuickViewProduct(product)}
-                    className="absolute inset-x-4 bottom-3 py-2 bg-black/80 backdrop-blur-md text-white text-xs font-semibold rounded-xl border border-white/20 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-1.5 hover:bg-white hover:text-black z-10"
-                  >
-                    <Eye className="w-3.5 h-3.5" /> Quick View
-                  </button>
-                </div>
+                </ProductCardMedia>
 
                 {/* Info */}
                 <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
@@ -116,9 +109,11 @@ export const RandomProducts: React.FC = () => {
                       </div>
                     </div>
 
-                    <h3 className="text-sm font-bold text-white group-hover:text-emerald-400 transition line-clamp-1">
-                      {product.name}
-                    </h3>
+                    <Link href={`/product/${product.id}`} className="block">
+                      <h3 className="text-sm font-bold text-white hover:text-emerald-400 transition line-clamp-1">
+                        {product.name}
+                      </h3>
+                    </Link>
                   </div>
 
                   {/* Price & Action */}

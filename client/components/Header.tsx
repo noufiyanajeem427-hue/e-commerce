@@ -237,10 +237,10 @@ export const Header: React.FC = () => {
                       Matching Products ({filteredProducts.length})
                     </p>
                     {filteredProducts.map((product) => (
-                      <div
+                      <Link
                         key={product.id}
+                        href={`/product/${product.id}`}
                         onClick={() => {
-                          setQuickViewProduct(product);
                           setIsSearchFocused(false);
                         }}
                         className="flex items-center gap-3 p-2 hover:bg-zinc-800/80 rounded-xl cursor-pointer transition group"
@@ -264,7 +264,7 @@ export const Header: React.FC = () => {
                             {formatPrice(product.originalPrice)}
                           </p>
                         </div>
-                      </div>
+                      </Link>
                     ))}
                   </div>
                 ) : (

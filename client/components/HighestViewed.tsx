@@ -5,8 +5,11 @@ import { HIGHEST_VIEWED_PRODUCTS } from "../data/products";
 import { Eye, Star, ShoppingBag, Heart, Eye as ViewIcon, Flame } from "lucide-react";
 import { useShop } from "../context/ShopContext";
 
+import Link from "next/link";
+import { ProductCardMedia } from "./ProductCardMedia";
+
 export const HighestViewed: React.FC = () => {
-  const { addToCart, toggleWishlist, isInWishlist, setQuickViewProduct, formatPrice } = useShop();
+  const { addToCart, toggleWishlist, isInWishlist, formatPrice } = useShop();
 
   return (
     <section id="highest-viewed" className="w-full bg-[#090D16] py-14 border-t border-white/5">
@@ -35,17 +38,10 @@ export const HighestViewed: React.FC = () => {
                 key={product.id}
                 className="group relative glass-card rounded-3xl overflow-hidden transition-all duration-500 shadow-xl flex flex-col justify-between hover:-translate-y-1.5"
               >
-                {/* Image Showcase */}
-                <div className="relative aspect-4/3 w-full overflow-hidden bg-slate-950">
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#090D16] via-transparent to-transparent opacity-60" />
-
+                {/* Image Showcase with Long Press -> Quick View, Single Click -> Slug */}
+                <ProductCardMedia product={product} aspectClass="aspect-4/3">
                   {/* Top Badges */}
-                  <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
+                  <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10 pointer-events-none">
                     {product.badge && (
                       <span className="px-3 py-1 rounded-xl bg-slate-950/80 backdrop-blur-md text-amber-400 text-[11px] font-bold border border-amber-400/30 shadow-lg flex items-center gap-1">
                         {product.badge}
@@ -60,7 +56,12 @@ export const HighestViewed: React.FC = () => {
 
                   {/* Wishlist Heart Button */}
                   <button
-                    onClick={() => toggleWishlist(product)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleWishlist(product);
+                    }}
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onTouchStart={(e) => e.stopPropagation()}
                     className={`absolute top-3 right-3 p-2.5 rounded-2xl backdrop-blur-md border transition z-10 ${
                       isWish
                         ? "bg-rose-500/90 text-white border-rose-400 shadow-lg shadow-rose-500/30"
@@ -69,15 +70,7 @@ export const HighestViewed: React.FC = () => {
                   >
                     <Heart className={`w-4 h-4 ${isWish ? "fill-white" : ""}`} />
                   </button>
-
-                  {/* Quick View Button */}
-                  <button
-                    onClick={() => setQuickViewProduct(product)}
-                    className="absolute inset-x-4 bottom-3 py-2 bg-slate-950/90 backdrop-blur-md text-white text-xs font-bold rounded-xl border border-white/20 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-1.5 hover:bg-white hover:text-black z-10"
-                  >
-                    <ViewIcon className="w-3.5 h-3.5" /> Quick View
-                  </button>
-                </div>
+                </ProductCardMedia>
 
                 {/* Info Content */}
                 <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
@@ -93,9 +86,11 @@ export const HighestViewed: React.FC = () => {
                       </div>
                     </div>
 
-                    <h3 className="text-sm font-bold text-white group-hover:text-amber-400 transition line-clamp-1">
-                      {product.name}
-                    </h3>
+                    <Link href={`/product/${product.id}`} className="block">
+                      <h3 className="text-sm font-bold text-white hover:text-amber-400 transition line-clamp-1">
+                        {product.name}
+                      </h3>
+                    </Link>
 
                     {/* Social proof line */}
                     {product.activeViewers && (

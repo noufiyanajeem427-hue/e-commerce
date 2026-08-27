@@ -5,11 +5,13 @@ import { FLASH_DEALS } from "../data/products";
 import { Percent, Clock, ShoppingBag, ChevronLeft, ChevronRight, Copy, Check, Flame } from "lucide-react";
 import { useShop } from "../context/ShopContext";
 import toast from "react-hot-toast";
+import Link from "next/link";
+import { ProductCardMedia } from "./ProductCardMedia";
 
 export const DiscountSlider: React.FC = () => {
   const [dealIndex, setDealIndex] = useState(0);
   const [copiedCode, setCopiedCode] = useState(false);
-  const { addToCart, setQuickViewProduct, formatPrice } = useShop();
+  const { addToCart, formatPrice } = useShop();
 
   const [timeLeft, setTimeLeft] = useState({ hours: 5, minutes: 24, seconds: 48 });
 
@@ -94,15 +96,12 @@ export const DiscountSlider: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-8 items-center">
             {/* Left Image */}
             <div className="lg:col-span-5 relative flex justify-center">
-              <div className="relative w-full max-w-sm aspect-square rounded-2xl overflow-hidden border border-rose-500/30 shadow-2xl group">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <span className="absolute top-4 left-4 px-3 py-1 bg-rose-500 text-black font-extrabold text-xs rounded-xl shadow-lg">
-                  {activeDeal.discountBadge}
-                </span>
+              <div className="relative w-full max-w-sm rounded-2xl overflow-hidden border border-rose-500/30 shadow-2xl">
+                <ProductCardMedia product={product} aspectClass="aspect-square">
+                  <span className="absolute top-4 left-4 px-3 py-1 bg-rose-500 text-black font-extrabold text-xs rounded-xl shadow-lg pointer-events-none">
+                    {activeDeal.discountBadge}
+                  </span>
+                </ProductCardMedia>
               </div>
             </div>
 
@@ -117,9 +116,11 @@ export const DiscountSlider: React.FC = () => {
                 </span>
               </div>
 
-              <h3 className="text-2xl sm:text-3xl font-black text-white leading-tight">
-                {product.name}
-              </h3>
+              <Link href={`/product/${product.id}`} className="block">
+                <h3 className="text-2xl sm:text-3xl font-black text-white hover:text-rose-400 transition leading-tight">
+                  {product.name}
+                </h3>
+              </Link>
 
               <p className="text-sm text-zinc-300 leading-relaxed max-w-xl">
                 {product.description}
@@ -163,12 +164,12 @@ export const DiscountSlider: React.FC = () => {
                   <ShoppingBag className="w-4 h-4 text-black" /> Claim Deal Now
                 </button>
 
-                <button
-                  onClick={() => setQuickViewProduct(product)}
+                <Link
+                  href={`/product/${product.id}`}
                   className="px-5 py-3.5 bg-zinc-900 hover:bg-zinc-800 text-white font-semibold text-sm rounded-2xl border border-zinc-700 transition"
                 >
                   View Details
-                </button>
+                </Link>
 
                 {/* Copy Coupon Pill */}
                 <button

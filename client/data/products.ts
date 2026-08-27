@@ -744,3 +744,32 @@ export const TESTIMONIALS: Testimonial[] = [
     date: "3 days ago",
   },
 ];
+
+export const getAllProducts = (): Product[] => {
+  const all: Product[] = [
+    ...HIGHEST_VIEWED_PRODUCTS,
+    ...TRENDING_PRODUCTS,
+    ...RANDOM_PRODUCTS,
+    ...FLASH_DEALS.map((fd) => fd.product),
+    ...CATEGORY_BOXES.flatMap((cb) => cb.products),
+  ];
+
+  // Filter out duplicates by ID
+  const map = new Map<string, Product>();
+  for (const item of all) {
+    if (!map.has(item.id)) {
+      map.set(item.id, item);
+    }
+  }
+  return Array.from(map.values());
+};
+
+export const getProductByIdOrSlug = (idOrSlug: string): Product | undefined => {
+  const decoded = decodeURIComponent(idOrSlug).toLowerCase();
+  const all = getAllProducts();
+  return all.find(
+    (p) =>
+      p.id.toLowerCase() === decoded ||
+      p.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") === decoded
+  );
+};

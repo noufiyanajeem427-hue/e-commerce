@@ -143,25 +143,35 @@ export const QuickViewModal: React.FC = () => {
               </div>
 
               {/* Actions */}
-              <div className="flex gap-3 pt-2">
-                <button
-                  onClick={handleAddToCart}
-                  className="flex-1 py-3 bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs rounded-xl shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2 transition"
-                >
-                  <ShoppingBag className="w-4 h-4 text-black" /> Add to Cart ({formatPrice(product.price * quantity)})
-                </button>
+              <div className="flex flex-col gap-2 pt-2">
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleAddToCart}
+                    className="flex-1 py-3 bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs rounded-xl shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2 transition"
+                  >
+                    <ShoppingBag className="w-4 h-4 text-black" /> Add to Cart ({formatPrice(product.price * quantity)})
+                  </button>
 
-                <button
-                  onClick={() => toggleWishlist(product)}
-                  className={`p-3 rounded-xl border transition ${
-                    isWish
-                      ? "bg-rose-500 text-white border-rose-400"
-                      : "bg-zinc-900 text-zinc-300 border-zinc-800 hover:text-rose-400"
-                  }`}
-                  title="Toggle Wishlist"
+                  <button
+                    onClick={() => toggleWishlist(product)}
+                    className={`p-3 rounded-xl border transition ${
+                      isWish
+                        ? "bg-rose-500 text-white border-rose-400"
+                        : "bg-zinc-900 text-zinc-300 border-zinc-800 hover:text-rose-400"
+                    }`}
+                    title="Toggle Wishlist"
+                  >
+                    <Heart className={`w-4 h-4 ${isWish ? "fill-white" : ""}`} />
+                  </button>
+                </div>
+
+                <a
+                  href={`/product/${product.id}`}
+                  onClick={() => setQuickViewProduct(null)}
+                  className="w-full py-2.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 hover:text-white font-bold text-xs rounded-xl border border-zinc-800 text-center transition"
                 >
-                  <Heart className={`w-4 h-4 ${isWish ? "fill-white" : ""}`} />
-                </button>
+                  View Full Product Page →
+                </a>
               </div>
 
               <div className="flex items-center justify-between text-[10px] text-zinc-400 pt-2 border-t border-zinc-900">
