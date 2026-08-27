@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ShoppingBag, Menu, ShoppingCart } from 'lucide-react';
+import { Store , Menu, ShoppingCart } from 'lucide-react';
 import Sidebar from './Sidebar';
 
 export default function Navbar() {
@@ -9,12 +9,13 @@ export default function Navbar() {
     <>
       <nav className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-100 sticky top-0 z-40">
         <div className="flex items-center gap-2">
-          <div className="w-10 h-10 bg-pink-100 rounded-lg flex items-center justify-center">
-            <ShoppingBag className="w-6 h-6 text-pink-500" />
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
+            <Store className="w-5 h-5" />
           </div>
-          <span className="text-xl font-bold text-indigo-600">Shop Shathi</span>
+          <span className="text-xl font-black tracking-tight text-slate-900">
+    Cart<span className="text-indigo-600">iva</span>
+  </span>
         </div>
-
         <div className="flex items-center gap-4">
           <div className="relative cursor-pointer">
             <ShoppingCart className="w-6 h-6 text-gray-700" />

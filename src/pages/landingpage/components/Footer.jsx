@@ -1,4 +1,4 @@
-import { ShoppingBag, ShieldCheck, Truck, CreditCard } from 'lucide-react';
+import { Store, ShieldCheck, Truck, CreditCard } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -8,11 +8,13 @@ export default function Footer() {
         {/* Brand & Tagline */}
         <div className="space-y-3">
           <div className="flex items-center gap-2 text-white">
-            <ShoppingBag className="w-6 h-6 text-indigo-400" />
-            <span className="text-xl font-bold tracking-tight">Shop Shathi</span>
+            <Store className="w-6 h-6 text-indigo-400" />
+            <span className="text-xl font-black tracking-tight text-white">
+              Cart<span className="text-indigo-600">iva</span>
+            </span>
           </div>
           <p className="text-xs text-slate-400 leading-relaxed max-w-md">
-            Your ultimate online shopping destination. We deliver the best products at the best prices, straight to your doorstep with guaranteed security.
+            Upgrade your everyday lifestyle with our handpicked collection of high-quality essentials. From safe checkout to prompt delivery, we prioritize your satisfaction every step of the way.
           </p>
         </div>
 
@@ -101,14 +103,14 @@ export default function Footer() {
               <li><a href="#" className="hover:text-white transition">Fashion</a></li>
               <li><a href="#" className="hover:text-white transition">Home & Kitchen</a></li>
               <li><a href="#" className="hover:text-white transition">Health & Beauty</a></li>
-              <li><a href="#" className="text-indigo-400 font-bold hover:underline flex items-center gap-1 mt-1">All Products →</a></li>
+              <li><a href="#" className="text-indigo-400 font-bold hover:underline flex items-center gap-1 mt-1">All Products </a></li>
             </ul>
           </div>
         </div>
 
         {/* Footer Bottom / Copyright */}
         <div className="border-t border-slate-800/80 pt-6 mt-8 text-center space-y-3 text-xs text-slate-500">
-          <p>© 2026 Shop Shathi. All rights reserved.</p>
+          <p>© 2026 Cartiva. All rights reserved.</p>
           <div className="flex justify-center gap-4 text-slate-400 text-[11px]">
             <a href="#" className="hover:text-white transition">Privacy Policy</a>
             <a href="#" className="hover:text-white transition">Terms of Service</a>

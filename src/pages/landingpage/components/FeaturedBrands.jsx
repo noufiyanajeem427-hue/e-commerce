@@ -24,7 +24,7 @@ export default function FeaturedBrands() {
           onClick={() => navigate('/featured-brands')}
           className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 hover:underline transition cursor-pointer"
         >
-          View All →
+          View All 
         </button>
       </div>
 

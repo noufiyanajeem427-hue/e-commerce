@@ -86,7 +86,7 @@ export default function TrendingProducts({ onViewAll }) {
           onClick={() => navigate('/trending-products')} 
           className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 hover:underline transition"
         >
-          View All →
+          View All 
         </button>
       </div>
 

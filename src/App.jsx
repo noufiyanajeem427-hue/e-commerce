@@ -5,6 +5,7 @@ import Register from './pages/auth/Register';
 import TrendingProductsPage from './pages/landingpage/TrendingProductsPage';
 import FeaturedBrandsPage from './pages/landingpage/FeaturedBrandsPage';
 import AllProductsPage from './pages/landingpage/AllProductsPage';
+import DealsAndOffersPage from './pages/landingpage/DealsAndOffersPage'; 
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/trending-products" element={<TrendingProductsPage />} />
         <Route path="/featured-brands" element={<FeaturedBrandsPage />} />
         <Route path="/all-products" element={<AllProductsPage />} />
+        <Route path="/deals" element={<DealsAndOffersPage />} /> 
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
       </Routes>

@@ -1,4 +1,4 @@
-import { X, Search, ShoppingBag } from 'lucide-react';
+import { X, Search, Store } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const categories = [
@@ -35,10 +35,12 @@ export default function Sidebar({ isOpen, onClose }) {
           {/* Header inside drawer */}
           <div className="flex items-center justify-between pb-2 border-b border-gray-100">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-pink-100 rounded-lg flex items-center justify-center">
-                <ShoppingBag className="w-5 h-5 text-pink-500" />
+              <div className="w-8 h-8 bg-indigo-50 rounded-lg flex items-center justify-center">
+                <Store className="w-5 h-5 text-indigo-600" />
               </div>
-              <span className="text-lg font-bold text-indigo-600">Shop Shathi</span>
+              <span className="text-lg font-bold text-slate-900">
+    Cart<span className="text-indigo-600">iva</span>
+  </span>
             </div>
             <button onClick={onClose} className="p-1 text-gray-500 hover:text-gray-800">
               <X className="w-6 h-6" />
