@@ -10,17 +10,13 @@ function App() {
           <a href="#">Dashboard</a>
           <a href="#">Products</a>
           <a href="#">Orders</a>
-
-    
           <a href="#">Settings</a>
         </nav>
       </aside>
-
       <main className="main-content">
         <header className="topbar">
           <h2>Overview</h2>
         </header>
-
         <section className="cards">
           <div className="card">
             <span>Total Revenue</span>
