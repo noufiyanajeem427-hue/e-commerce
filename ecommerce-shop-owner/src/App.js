@@ -7,6 +7,8 @@ function App() {
       <aside className="sidebar">
         <h1>Owner Panel</h1>
         <nav>
+
+    
           <a href="#">Dashboard</a>
           <a href="#">Products</a>
           <a href="#">Orders</a>
@@ -22,6 +24,8 @@ function App() {
             <span>Total Revenue</span>
             <strong>$24,500</strong>
           </div>
+
+    
           <div className="card">
             <span>Orders</span>
             <strong>328</strong>
