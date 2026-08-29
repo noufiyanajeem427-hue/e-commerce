@@ -1,16 +1,16 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Search, SlidersHorizontal, ChevronDown, Check, Tag } from 'lucide-react';
+import { ArrowLeft, Plus, Search, ChevronDown, Check } from 'lucide-react';
 
 const allDeals = [
-  { id: 1, category: 'Festive Decor', title: 'Handcrafted Diwali Toran/Door Hanging', price: '₹999.00', originalPrice: '₹1,499.00', rawPrice: 999, discount: 'SAVE 33%', discountPercent: 33, image: 'https://images.unsplash.com/photo-1605883746910-ee44370e30f4?auto=format&fit=crop&w=500&q=80' },
-  { id: 2, category: 'Accessories', title: 'Tommy Hilfiger Leather Wallet', price: '₹1,999.00', originalPrice: '₹2,999.00', rawPrice: 1999, discount: 'SAVE 33%', discountPercent: 33, image: 'https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=500&q=80' },
-  { id: 3, category: 'Fitness', title: 'Fit Simplify Resistance Loop Exercise Bands', price: '₹999.00', originalPrice: '₹1,499.00', rawPrice: 999, discount: 'SAVE 33%', discountPercent: 33, image: 'https://images.unsplash.com/photo-1598289431512-b97b0917affc?auto=format&fit=crop&w=500&q=80' },
-  { id: 4, category: 'Apparel', title: "Carter's Cotton Pajama Set", price: '₹1,299.00', originalPrice: '₹1,899.00', rawPrice: 1299, discount: 'SAVE 32%', discountPercent: 32, image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=500&q=80' },
-  { id: 5, category: 'Audio', title: 'JBL Flip 6 Wireless Bluetooth Speaker', price: '₹8,999.00', originalPrice: '₹13,999.00', rawPrice: 8999, discount: 'SAVE 36%', discountPercent: 36, image: 'https://images.unsplash.com/photo-1545454675-3531b543be5d?auto=format&fit=crop&w=500&q=80' },
-  { id: 6, category: 'Footwear', title: 'Puma Unisex Running Shoes', price: '₹2,499.00', originalPrice: '₹4,999.00', rawPrice: 2499, discount: 'SAVE 50%', discountPercent: 50, image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=500&q=80' },
-  { id: 7, category: 'Home', title: 'Stainless Steel Insulated Water Bottle (1L)', price: '₹699.00', originalPrice: '₹1,199.00', rawPrice: 699, discount: 'SAVE 41%', discountPercent: 41, image: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&fit=crop&w=500&q=80' },
-  { id: 8, category: 'Accessories', title: 'Fossil Minimalist Chronograph Watch', price: '₹6,495.00', originalPrice: '₹10,995.00', rawPrice: 6495, discount: 'SAVE 40%', discountPercent: 40, image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=500&q=80' },
+  { id: 1, category: 'Festive Decor', brand: 'Festive Home', title: 'Handcrafted Diwali Toran/Door Hanging', price: '₹999.00', originalPrice: '₹1,499.00', rawPrice: 999, discount: 'SAVE 33%', discountPercent: 33, rating: 4.8, image: 'https://images.unsplash.com/photo-1605883746910-ee44370e30f4?auto=format&fit=crop&w=500&q=80', description: 'Beautiful traditional handcrafted door hanging decoration for festive occasions.' },
+  { id: 2, category: 'Accessories', brand: 'Tommy Hilfiger', title: 'Tommy Hilfiger Leather Wallet', price: '₹1,999.00', originalPrice: '₹2,999.00', rawPrice: 1999, discount: 'SAVE 33%', discountPercent: 33, rating: 4.7, image: 'https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=500&q=80', description: 'Premium genuine leather bi-fold wallet featuring multiple card slots and sleek design.' },
+  { id: 3, category: 'Fitness', brand: 'Fit Simplify', title: 'Fit Simplify Resistance Loop Exercise Bands', price: '₹999.00', originalPrice: '₹1,499.00', rawPrice: 999, discount: 'SAVE 33%', discountPercent: 33, rating: 4.6, image: 'https://images.unsplash.com/photo-1598289431512-b97b0917affc?auto=format&fit=crop&w=500&q=80', description: 'Set of heavy-duty latex resistance loop bands for workout, stretching, and physical therapy.' },
+  { id: 4, category: 'Apparel', brand: "Carter's", title: "Carter's Cotton Pajama Set", price: '₹1,299.00', originalPrice: '₹1,899.00', rawPrice: 1299, discount: 'SAVE 32%', discountPercent: 32, rating: 4.8, image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=500&q=80', description: 'Soft 100% breathable cotton pajama set designed for ultimate night-time comfort.' },
+  { id: 5, category: 'Audio', brand: 'JBL', title: 'JBL Flip 6 Wireless Bluetooth Speaker', price: '₹8,999.00', originalPrice: '₹13,999.00', rawPrice: 8999, discount: 'SAVE 36%', discountPercent: 36, rating: 4.9, image: 'https://images.unsplash.com/photo-1545454675-3531b543be5d?auto=format&fit=crop&w=500&q=80', description: 'Portable waterproof speaker with powerful sound and deep bass.' },
+  { id: 6, category: 'Footwear', brand: 'Puma', title: 'Puma Unisex Running Shoes', price: '₹2,499.00', originalPrice: '₹4,999.00', rawPrice: 2499, discount: 'SAVE 50%', discountPercent: 50, rating: 4.5, image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=500&q=80', description: 'Lightweight and breathable running shoes designed for everyday performance.' },
+  { id: 7, category: 'Home', brand: 'Milton', title: 'Stainless Steel Insulated Water Bottle (1L)', price: '₹699.00', originalPrice: '₹1,199.00', rawPrice: 699, discount: 'SAVE 41%', discountPercent: 41, rating: 4.6, image: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&fit=crop&w=500&q=80', description: 'Double-walled vacuum insulated flask that keeps drinks hot or cold for 24 hours.' },
+  { id: 8, category: 'Accessories', brand: 'Fossil', title: 'Fossil Minimalist Chronograph Watch', price: '₹6,495.00', originalPrice: '₹10,995.00', rawPrice: 6495, discount: 'SAVE 40%', discountPercent: 40, rating: 4.7, image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=500&q=80', description: 'Sleek chronograph watch with genuine leather strap and minimalist dial.' },
 ];
 
 const categories = ['All', 'Festive Decor', 'Accessories', 'Fitness', 'Apparel', 'Audio', 'Footwear', 'Home'];
@@ -38,6 +38,12 @@ export default function DealsAndOffersPage() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Direct Product Navigation Handler
+  const handleDealSelect = (deal) => {
+    const id = deal._id || deal.id || '1';
+    navigate(`/product/${id}`, { state: { product: deal } });
+  };
 
   const filteredDeals = allDeals.filter((item) => {
     const matchesCat = selectedCat === 'All' || item.category === selectedCat;
@@ -144,13 +150,21 @@ export default function DealsAndOffersPage() {
       {/* Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
         {sortedDeals.map((item) => (
-          <div key={item.id} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition">
+          <div 
+            key={item.id} 
+            onClick={() => handleDealSelect(item)}
+            className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition cursor-pointer group"
+          >
             <div className="relative">
               <span className="absolute top-2 left-2 bg-amber-500 text-black text-[10px] font-extrabold px-2 py-0.5 rounded-md z-10 shadow-sm">
                 ✨ {item.discount}
               </span>
               <div className="h-44 w-full overflow-hidden bg-gray-100">
-                <img src={item.image} alt={item.title} className="w-full h-full object-cover hover:scale-105 transition duration-300" />
+                <img 
+                  src={item.image} 
+                  alt={item.title} 
+                  className="w-full h-full object-cover group-hover:scale-105 transition duration-300" 
+                />
               </div>
               <div className="p-3">
                 <span className="text-xs text-slate-500 block mb-1">{item.category}</span>
@@ -165,7 +179,13 @@ export default function DealsAndOffersPage() {
                 <div className="text-sm font-extrabold text-indigo-600">{item.price}</div>
                 <div className="text-xs text-slate-400 line-through">{item.originalPrice}</div>
               </div>
-              <button className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center hover:bg-indigo-600 transition active:scale-95 cursor-pointer">
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDealSelect(item);
+                }}
+                className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center hover:bg-indigo-600 transition active:scale-95 cursor-pointer"
+              >
                 <Plus className="w-4 h-4" />
               </button>
             </div>

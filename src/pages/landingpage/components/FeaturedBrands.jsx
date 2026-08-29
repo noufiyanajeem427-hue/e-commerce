@@ -13,6 +13,11 @@ const brands = [
 export default function FeaturedBrands() {
   const navigate = useNavigate();
 
+  const handleBrandClick = (brandName) => {
+    // Navigates directly to the products view for this brand
+    navigate(`/featured-brands?brand=${encodeURIComponent(brandName)}`);
+  };
+
   return (
     <section className="py-6 px-4 bg-white max-w-7xl mx-auto">
       <div className="flex items-center justify-between mb-4">
@@ -32,7 +37,7 @@ export default function FeaturedBrands() {
         {brands.map((brand, idx) => (
           <div
             key={idx}
-            onClick={() => navigate('/featured-brands')}
+            onClick={() => handleBrandClick(brand.name)}
             className={`${brand.bg} border border-slate-100 rounded-2xl p-6 flex items-center justify-center cursor-pointer hover:shadow-md transition active:scale-95`}
           >
             <span className="font-black tracking-widest text-slate-800 text-sm sm:text-base">

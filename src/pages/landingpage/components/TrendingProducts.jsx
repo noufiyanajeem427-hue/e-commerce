@@ -14,6 +14,7 @@ const products = [
     rating: '4.8',
     reviews: '124',
     image: 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?auto=format&fit=crop&w=500&q=80',
+    description: 'High-performance gaming laptop equipped with the latest Intel Core i9 processor and RTX 4070 GPU.'
   },
   {
     id: 2,
@@ -24,6 +25,7 @@ const products = [
     rating: '4.9',
     reviews: '310',
     image: 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?auto=format&fit=crop&w=500&q=80',
+    description: 'Ultimate flagship smartphone featuring Galaxy AI, 200MP camera, and built-in S Pen.'
   },
   {
     id: 3,
@@ -34,6 +36,7 @@ const products = [
     rating: '4.7',
     reviews: '89',
     image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=500&q=80',
+    description: 'Industry-leading noise canceling headphones with exceptional audio quality and 30-hour battery life.'
   },
   {
     id: 4,
@@ -44,6 +47,7 @@ const products = [
     rating: '4.9',
     reviews: '42',
     image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=500&q=80',
+    description: 'Advanced full-frame mirrorless camera for professional photographers and videographers.'
   },
   {
     id: 5,
@@ -54,6 +58,7 @@ const products = [
     rating: '4.8',
     reviews: '512',
     image: 'https://images.unsplash.com/photo-1606813907291-d86efa9b94db?auto=format&fit=crop&w=500&q=80',
+    description: 'Next-gen gaming console with ultra-high speed SSD and immersive haptic feedback.'
   },
   {
     id: 6,
@@ -64,16 +69,18 @@ const products = [
     rating: '4.9',
     reviews: '204',
     image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=500&q=80',
+    description: 'Supercharged by Apple Silicon M3 Pro chip for peak efficiency and performance.'
   },
 ];
 
-export default function TrendingProducts({ onViewAll }) {
+export default function TrendingProducts({ onSelectProduct }) {
   const [activeCategory, setActiveCategory] = useState('All');
+  const navigate = useNavigate();
 
   const filteredProducts = activeCategory === 'All'
     ? products
     : products.filter(p => p.category === activeCategory);
-  const navigate = useNavigate();
+
   return (
     <section className="py-6 px-4 bg-slate-50 max-w-7xl mx-auto">
       {/* Header */}
@@ -81,10 +88,10 @@ export default function TrendingProducts({ onViewAll }) {
         <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
           <Flame className="w-5 h-5 text-amber-500 fill-amber-500" /> Trending Products
         </h2>
-        {/* Navigate on click */}
+        {/* View All Button */}
         <button 
           onClick={() => navigate('/trending-products')} 
-          className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 hover:underline transition"
+          className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 hover:underline transition cursor-pointer"
         >
           View All 
         </button>
@@ -96,7 +103,7 @@ export default function TrendingProducts({ onViewAll }) {
           <button
             key={cat}
             onClick={() => setActiveCategory(cat)}
-            className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
               activeCategory === cat
                 ? 'bg-slate-900 text-white shadow-sm'
                 : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
@@ -107,13 +114,21 @@ export default function TrendingProducts({ onViewAll }) {
         ))}
       </div>
 
-      {/* Grid */}
+      {/* Product Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
         {filteredProducts.slice(0, 4).map((item) => (
-          <div key={item.id} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition">
+          <div 
+            key={item.id} 
+            onClick={() => onSelectProduct && onSelectProduct(item)}
+            className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition cursor-pointer group"
+          >
             <div>
-              <div className="h-36 sm:h-44 w-full overflow-hidden bg-gray-100 relative group">
-                <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
+              <div className="h-36 sm:h-44 w-full overflow-hidden bg-gray-100 relative">
+                <img 
+                  src={item.image} 
+                  alt={item.title} 
+                  className="w-full h-full object-cover group-hover:scale-105 transition duration-300" 
+                />
                 <span className="absolute top-2 left-2 bg-slate-900/80 backdrop-blur-sm text-white text-[10px] font-medium px-2 py-0.5 rounded-full">
                   {item.category}
                 </span>
@@ -133,7 +148,13 @@ export default function TrendingProducts({ onViewAll }) {
 
             <div className="p-3 pt-0 flex justify-between items-center">
               <span className="text-sm font-extrabold text-indigo-600">{item.price}</span>
-              <button className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center hover:bg-indigo-600 transition active:scale-95">
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevents navigating to details page when clicking '+'
+                  if (onSelectProduct) onSelectProduct(item);
+                }}
+                className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center hover:bg-indigo-600 transition active:scale-95 cursor-pointer"
+              >
                 <Plus className="w-4 h-4" />
               </button>
             </div>

@@ -9,6 +9,7 @@ const recentItems = [
     price: '₹1,54,990.00',
     rating: '4.8',
     image: 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=500&q=80',
+    description: 'High-performance gaming laptop equipped with the latest Intel Core i9 processor and RTX 4070 GPU.'
   },
   {
     id: 2,
@@ -17,6 +18,7 @@ const recentItems = [
     price: '₹54,999.00',
     rating: '4.9',
     image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?auto=format&fit=crop&w=500&q=80',
+    description: '16 cores and 32 processing threads for demanding gamers and creators.'
   },
   {
     id: 3,
@@ -25,6 +27,7 @@ const recentItems = [
     price: '₹29,990.00',
     rating: '4.8',
     image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=500&q=80',
+    description: 'Industry-leading noise canceling headphones with exceptional audio quality.'
   },
   {
     id: 4,
@@ -33,10 +36,11 @@ const recentItems = [
     price: '₹44,900.00',
     rating: '4.7',
     image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=500&q=80',
+    description: 'Powerful health tracker with Double Tap gesture and brighter Always-On display.'
   },
 ];
 
-export default function RecentlyViewed() {
+export default function RecentlyViewed({ onSelectProduct }) {
   const navigate = useNavigate();
 
   return (
@@ -48,14 +52,22 @@ export default function RecentlyViewed() {
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
         {recentItems.map((item) => (
-          <div key={item.id} className="bg-slate-50/50 rounded-2xl overflow-hidden shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition">
+          <div 
+            key={item.id} 
+            onClick={() => onSelectProduct && onSelectProduct(item)}
+            className="bg-slate-50/50 rounded-2xl overflow-hidden shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition cursor-pointer group"
+          >
             <div>
               <div className="h-44 w-full overflow-hidden bg-gray-100">
-                <img src={item.image} alt={item.title} className="w-full h-full object-cover hover:scale-105 transition duration-300" />
+                <img 
+                  src={item.image} 
+                  alt={item.title} 
+                  className="w-full h-full object-cover group-hover:scale-105 transition duration-300" 
+                />
               </div>
               <div className="p-3">
                 <div className="flex justify-between items-center text-xs text-slate-500 mb-1">
-                  <span>{item.brand}</span>
+                  <span className="font-medium text-slate-400">{item.brand}</span>
                   <span className="flex items-center text-amber-500 font-semibold gap-0.5">
                     <Star className="w-3 h-3 fill-amber-500" /> {item.rating}
                   </span>
@@ -68,7 +80,13 @@ export default function RecentlyViewed() {
 
             <div className="p-3 pt-0 flex justify-between items-center">
               <span className="text-sm font-extrabold text-indigo-600">{item.price}</span>
-              <button className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center hover:bg-indigo-600 transition active:scale-95 cursor-pointer">
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (onSelectProduct) onSelectProduct(item);
+                }}
+                className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center hover:bg-indigo-600 transition active:scale-95 cursor-pointer"
+              >
                 <Plus className="w-4 h-4" />
               </button>
             </div>
