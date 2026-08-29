@@ -16,8 +16,10 @@ export const QuickViewModal: React.FC = () => {
   const isWish = isInWishlist(product.id);
 
   const handleAddToCart = () => {
-    addToCart(product, quantity, selectedSize, selectedColor);
-    setQuickViewProduct(null);
+    const added = addToCart(product, quantity, selectedSize, selectedColor);
+    if (added) {
+      setQuickViewProduct(null);
+    }
   };
 
   return (

@@ -69,12 +69,13 @@ function ProductDetailContent({ id }: { id: string }) {
 
   const handleAddToCart = () => {
     addToCart(product, quantity, selectedSize, selectedColor);
-    toast.success(`Added ${quantity}x "${product.name}" to cart!`);
   };
 
   const handleBuyNow = () => {
-    addToCart(product, quantity, selectedSize, selectedColor);
-    setIsCartOpen(true);
+    const added = addToCart(product, quantity, selectedSize, selectedColor);
+    if (added) {
+      setIsCartOpen(true);
+    }
   };
 
   const handleShare = () => {

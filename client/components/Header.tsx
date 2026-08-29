@@ -64,12 +64,12 @@ export const Header: React.FC = () => {
 
   const filteredProducts = searchQuery.trim()
     ? allProducts
-        .filter(
-          (p) =>
-            p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            p.category.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-        .slice(0, 5)
+      .filter(
+        (p) =>
+          p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          p.category.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+      .slice(0, 5)
     : [];
 
   useEffect(() => {
@@ -165,11 +165,10 @@ export const Header: React.FC = () => {
 
       {/* Main Navbar */}
       <div
-        className={`w-full transition-all duration-300 ${
-          isScrolled
+        className={`w-full transition-all duration-300 ${isScrolled
             ? "bg-zinc-950/90 backdrop-blur-md border-b border-zinc-800/80 shadow-2xl py-3"
             : "bg-zinc-950 border-b border-zinc-800 py-4"
-        }`}
+          }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
           {/* Brand Logo */}
@@ -405,7 +404,7 @@ export const Header: React.FC = () => {
                     >
                       <div className="flex items-center gap-2">
                         <ShoppingBag className="w-4 h-4 text-amber-400" />
-                        <span>Active Cart</span>
+                        <span>Cart</span>
                       </div>
                       <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400 font-bold">
                         {totalCartCount} items

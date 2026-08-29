@@ -1,6 +1,8 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "./AuthContext";
 import { Product, CartItem, Currency } from "../types";
 import toast, { Toaster } from "react-hot-toast";
 
@@ -21,11 +23,11 @@ interface ShopContextType {
   setIsCartOpen: (open: boolean) => void;
   quickViewProduct: Product | null;
   setQuickViewProduct: (product: Product | null) => void;
-  addToCart: (product: Product, quantity?: number, selectedSize?: string, selectedColor?: string) => void;
+  addToCart: (product: Product, quantity?: number, selectedSize?: string, selectedColor?: string) => boolean;
   removeFromCart: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
-  toggleWishlist: (product: Product) => void;
+  toggleWishlist: (product: Product) => boolean;
   isInWishlist: (productId: string) => boolean;
   totalCartCount: number;
   totalCartPriceUSD: number;
@@ -34,6 +36,8 @@ interface ShopContextType {
 const ShopContext = createContext<ShopContextType | undefined>(undefined);
 
 export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const router = useRouter();
+  const { isAuthenticated } = useAuth();
   const [cart, setCart] = useState<CartItem[]>([]);
   const [wishlist, setWishlist] = useState<Product[]>([]);
   const [currency, setCurrency] = useState<Currency>("USD");
@@ -82,7 +86,16 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
     quantity = 1,
     selectedSize?: string,
     selectedColor?: string
-  ) => {
+  ): boolean => {
+    if (!isAuthenticated) {
+      toast.error("Please login to your account first to add items to cart!", {
+        icon: "🔒",
+        duration: 3500,
+      });
+      router.push("/login");
+      return false;
+    }
+
     setCart((prevCart) => {
       const existingIndex = prevCart.findIndex((item) => item.product.id === product.id);
       if (existingIndex > -1) {
@@ -124,6 +137,7 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
       ),
       { duration: 3000 }
     );
+    return true;
   };
 
   const removeFromCart = (productId: string) => {
@@ -147,7 +161,16 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setCart([]);
   };
 
-  const toggleWishlist = (product: Product) => {
+  const toggleWishlist = (product: Product): boolean => {
+    if (!isAuthenticated) {
+      toast.error("Please login to your account first to save favorites!", {
+        icon: "🔒",
+        duration: 3500,
+      });
+      router.push("/login");
+      return false;
+    }
+
     const exists = wishlist.some((item) => item.id === product.id);
     if (exists) {
       setWishlist((prev) => prev.filter((item) => item.id !== product.id));
@@ -156,6 +179,7 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setWishlist((prev) => [...prev, product]);
       toast("Added to Wishlist!", { icon: "💖" });
     }
+    return true;
   };
 
   const isInWishlist = (productId: string) => {
