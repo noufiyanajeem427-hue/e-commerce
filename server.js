@@ -1,4 +1,4 @@
-const express = require("express");
+const express = require("express");//express is a web application framework for Node.js that simplifies the process of building web applications and APIs. It provides a set of features and tools for handling HTTP requests, routing, middleware, and more.
 const dotenv = require("dotenv");
 const cors = require("cors");
 const connectDB = require("./config/db");
