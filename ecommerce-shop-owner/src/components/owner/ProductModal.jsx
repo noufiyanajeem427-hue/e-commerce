@@ -8,8 +8,4 @@ const ProductModal = () => {
     </div>
   );
 };
-4
-
-
-
 export default ProductModal;
