@@ -68,7 +68,7 @@ function BecomeSellerForm() {
                 <Sparkles className="w-4 h-4 text-white" />
               </div>
               <span className="font-extrabold tracking-tight bg-gradient-to-r from-white to-amber-400 bg-clip-text text-transparent">
-                LUXE CART
+                CARTIVA
               </span>
             </Link>
             <Link
@@ -91,7 +91,7 @@ function BecomeSellerForm() {
               </span>
               <h2 className="text-2xl font-black text-white mt-3">You are Already a Seller!</h2>
               <p className="text-xs text-zinc-400 mt-2">
-                Store: <span className="text-white font-bold">{user.sellerInfo?.storeName || "Your Luxe Store"}</span> ({user.sellerInfo?.storeCategory || "Merchant"})
+                Store: <span className="text-white font-bold">{user.sellerInfo?.storeName || "Your Cartiva Store"}</span> ({user.sellerInfo?.storeCategory || "Merchant"})
               </p>
             </div>
 
@@ -126,7 +126,7 @@ function BecomeSellerForm() {
                 <Sparkles className="w-4 h-4 text-white" />
               </div>
               <span className="font-extrabold tracking-tight bg-gradient-to-r from-white to-amber-400 bg-clip-text text-transparent">
-                LUXE CART
+                CARTIVA
               </span>
             </Link>
             <Link
@@ -147,7 +147,7 @@ function BecomeSellerForm() {
             <div className="space-y-2">
               <h2 className="text-2xl font-black text-white">Sign In to Become a Seller</h2>
               <p className="text-xs text-zinc-400 leading-relaxed max-w-sm mx-auto">
-                Please sign in to your customer account first or create one to register your store and start selling on Luxe Cart.
+                Please sign in to your customer account first or create one to register your store and start selling on Cartiva.
               </p>
             </div>
 
@@ -230,7 +230,7 @@ function BecomeSellerForm() {
             </div>
             <div className="flex flex-col">
               <span className="text-lg font-black tracking-tight bg-gradient-to-r from-white via-zinc-200 to-amber-400 bg-clip-text text-transparent">
-                LUXE CART
+                CARTIVA
               </span>
               <span className="text-[8px] font-bold tracking-widest text-amber-400 -mt-1 uppercase">
                 Merchant Partner Network
@@ -291,7 +291,7 @@ function BecomeSellerForm() {
               <ShieldCheck className="w-5 h-5" />
             </div>
             <h3 className="text-sm font-bold text-white">Verified Merchant Badge</h3>
-            <p className="text-xs text-zinc-400">Boost buyer trust instantly with official Luxe Cart merchant verification.</p>
+            <p className="text-xs text-zinc-400">Boost buyer trust instantly with official Cartiva merchant verification.</p>
           </div>
         </div>
 
@@ -556,7 +556,7 @@ function BecomeSellerForm() {
                       className="mt-0.5 w-4 h-4 rounded border-zinc-800 bg-zinc-900 text-amber-500 focus:ring-amber-400/30 accent-amber-500 cursor-pointer"
                     />
                     <label htmlFor="terms" className="text-xs text-zinc-300 cursor-pointer leading-relaxed">
-                      I agree to the <strong className="text-amber-400">Luxe Cart Merchant Terms</strong>, authentic product guarantee policy, and 85% revenue disbursement protocol.
+                      I agree to the <strong className="text-amber-400">Cartiva Merchant Terms</strong>, authentic product guarantee policy, and 85% revenue disbursement protocol.
                     </label>
                   </div>
                 </div>
@@ -592,7 +592,7 @@ function BecomeSellerForm() {
 
       {/* Footer */}
       <footer className="w-full border-t border-zinc-900 py-6 px-6 text-center text-xs text-zinc-500">
-        <p>© 2026 LUXE CART Merchant Network. Encrypted 256-bit SSL transaction protection.</p>
+        <p>© 2026 CARTIVA Merchant Network. Encrypted 256-bit SSL transaction protection.</p>
       </footer>
     </div>
   );

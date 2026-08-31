@@ -42,7 +42,7 @@ const DEMO_USERS: Record<"admin" | "user", User> = {
   admin: {
     id: "usr_adm_0001",
     name: "Elena Rostova (Admin)",
-    email: "elena.admin@luxecart.com",
+    email: "elena.admin@cartiva.com",
     avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80",
     role: "admin",
     tier: "Standard",
@@ -177,7 +177,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     saveUserSession(newUser);
     setIsLoading(false);
-    toast.success(`Welcome to Luxe Cart, ${newUser.name}! Your 20% discount is active.`);
+    toast.success(`Welcome to Cartiva, ${newUser.name}! Your 20% discount is active.`);
     return true;
   };
 
@@ -189,7 +189,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = () => {
     saveUserSession(null);
-    toast("You have signed out of Luxe Cart", { icon: "👋" });
+    toast("You have signed out of Cartiva", { icon: "👋" });
   };
 
   const updateProfile = (updatedData: Partial<User>) => {

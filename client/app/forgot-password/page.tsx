@@ -44,10 +44,10 @@ function ForgotPasswordForm() {
             </div>
             <div className="flex flex-col">
               <span className="text-lg font-black tracking-tight bg-gradient-to-r from-white via-zinc-200 to-amber-400 bg-clip-text text-transparent">
-                LUXE CART
+                CARTIVA
               </span>
               <span className="text-[8px] font-bold tracking-widest text-indigo-400 -mt-1 uppercase">
-                Artisanal Store
+                Premium Store
               </span>
             </div>
           </Link>
@@ -99,7 +99,7 @@ function ForgotPasswordForm() {
               <div>
                 <h1 className="text-2xl font-black text-white">Reset Your Password</h1>
                 <p className="text-xs text-zinc-400 mt-1.5 leading-relaxed">
-                  Enter the email address registered with your Luxe Cart account and we'll send you instructions to reset your password.
+                  Enter the email address registered with your Cartiva account and we'll send you instructions to reset your password.
                 </p>
               </div>
 
@@ -112,7 +112,7 @@ function ForgotPasswordForm() {
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="e.g. alexander@luxecart.com"
+                      placeholder="e.g. alexander@cartiva.com"
                       className="w-full bg-zinc-950/80 border border-zinc-800 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-zinc-500 outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/30 transition"
                     />
                     <Mail className="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -151,7 +151,7 @@ function ForgotPasswordForm() {
 
       {/* Footer minimal info */}
       <footer className="w-full border-t border-zinc-900 py-4 px-6 text-center text-xs text-zinc-500">
-        <p>© 2026 LUXE CART. Secure Account Recovery.</p>
+        <p>© 2026 CARTIVA. Secure Account Recovery.</p>
       </footer>
     </div>
   );

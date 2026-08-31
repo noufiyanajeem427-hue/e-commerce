@@ -78,7 +78,7 @@ export const Footer: React.FC = () => {
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
               <span className="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white via-zinc-200 to-amber-400 bg-clip-text text-transparent">
-                LUXE CART
+                CARTIVA
               </span>
             </a>
 
@@ -105,7 +105,7 @@ export const Footer: React.FC = () => {
             {subscribed ? (
               <div className="p-3 bg-emerald-500/20 border border-emerald-500/30 rounded-xl text-emerald-300 text-xs font-semibold flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                Subscribed successfully! Coupon code LUXE20 sent to your email.
+                Subscribed successfully! Coupon code CARTIVA20 sent to your email.
               </div>
             ) : (
               <form onSubmit={handleSubscribe} className="flex gap-2">
@@ -161,7 +161,7 @@ export const Footer: React.FC = () => {
 
         {/* Bottom Rights & Scroll to top */}
         <div className="pt-8 border-t border-zinc-900 flex flex-col sm:flex-row items-center justify-between text-xs text-zinc-500 gap-4">
-          <p>© 2026 LUXE CART E-Commerce. All rights reserved.</p>
+          <p>© 2026 CARTIVA E-Commerce. All rights reserved.</p>
 
           {/* Payment Badges */}
           <div className="flex items-center gap-3 font-semibold text-[11px] text-zinc-400">

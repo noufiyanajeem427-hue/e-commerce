@@ -105,7 +105,7 @@ export const Header: React.FC = () => {
             <span className="hidden sm:inline">Free Express Delivery on orders over $50</span>
             <span className="sm:hidden">Free Shipping &gt; $50</span>
             <span className="hidden md:inline-block text-amber-300 font-bold ml-2">
-              Use Coupon: LUXE20 (20% Off)
+              Use Coupon: CARTIVA20 (20% Off)
             </span>
           </div>
 
@@ -115,37 +115,33 @@ export const Header: React.FC = () => {
                 <span className="hidden sm:flex items-center gap-1 text-amber-400 font-semibold">
                   <Crown className="w-3 h-3" /> Hi, {user.name.split(" ")[0]} ({user.tier})
                 </span>
-
-                {/* Become a Seller / Seller Dashboard Link */}
-                {user.isSeller || user.role === "seller" ? (
-                  <Link
-                    href="/seller/dashboard"
-                    className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 font-bold transition"
-                  >
-                    <Store className="w-3 h-3 text-emerald-400" />
-                    <span>Seller Dashboard</span>
-                  </Link>
-                ) : (
-                  <Link
-                    href="/become-seller"
-                    className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-500/20 to-orange-500/20 hover:from-amber-500/30 hover:to-orange-500/30 text-amber-300 border border-amber-500/40 font-bold shadow-sm shadow-amber-500/10 transition animate-pulse"
-                  >
-                    <Briefcase className="w-3 h-3 text-amber-400" />
-                    <span>Become a Seller</span>
-                  </Link>
-                )}
+                <Link
+                  href="/become-seller"
+                  className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-500/20 to-orange-500/20 hover:from-amber-500/30 hover:to-orange-500/30 text-amber-300 border border-amber-500/40 font-bold shadow-sm shadow-amber-500/10 transition"
+                >
+                  <Briefcase className="w-3 h-3 text-amber-400" />
+                  <span>Become a Seller</span>
+                </Link>
               </>
             ) : (
-              <Link
-                href="/login"
-                className="hidden sm:flex items-center gap-1 text-zinc-300 hover:text-amber-400 transition"
-              >
-                <LogIn className="w-3 h-3 text-amber-400" /> Member Sign In (20% Off)
-              </Link>
+              <>
+                <Link
+                  href="/become-seller"
+                  className="hidden sm:flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold transition"
+                >
+                  <Briefcase className="w-3 h-3 text-amber-400" /> Become a Seller
+                </Link>
+                <Link
+                  href="/login"
+                  className="hidden sm:flex items-center gap-1 text-zinc-300 hover:text-amber-400 transition"
+                >
+                  <LogIn className="w-3 h-3 text-amber-400" /> Member Sign In (20% Off)
+                </Link>
+              </>
             )}
 
             <span className="hidden md:flex items-center gap-1 hover:text-white transition cursor-pointer">
-              <PhoneCall className="w-3 h-3 text-indigo-400" /> Support: +1 (800) 888-LUXE
+              <PhoneCall className="w-3 h-3 text-indigo-400" /> Support: +1 (800) 888-CARTIVA
             </span>
             <div className="flex items-center gap-2 border-l border-zinc-700 pl-3">
               <select
@@ -171,17 +167,17 @@ export const Header: React.FC = () => {
           }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
-          {/* Brand Logo */}
+            {/* Brand Logo */}
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-amber-500 flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform duration-300">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
             <div className="flex flex-col">
               <span className="text-xl font-black tracking-tight bg-gradient-to-r from-white via-zinc-200 to-amber-400 bg-clip-text text-transparent">
-                LUXE CART
+                CARTIVA
               </span>
               <span className="text-[9px] font-bold tracking-widest text-indigo-400 -mt-1 uppercase">
-                Artisanal Store
+                Premium Store
               </span>
             </div>
           </Link>
@@ -339,45 +335,25 @@ export const Header: React.FC = () => {
                   </div>
 
                   <div className="space-y-1 text-xs">
-                    {/* Become a Seller / Seller Dashboard Section in Dropdown */}
-                    {user.isSeller || user.role === "seller" ? (
-                      <Link
-                        href="/seller/dashboard"
-                        onClick={() => setUserDropdownOpen(false)}
-                        className="flex items-center justify-between p-2.5 rounded-xl bg-gradient-to-r from-emerald-950/60 to-teal-950/60 hover:from-emerald-900/60 hover:to-teal-900/60 text-emerald-300 border border-emerald-500/30 transition group"
-                      >
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
-                            <Store className="w-4 h-4" />
-                          </div>
-                          <div>
-                            <p className="font-bold text-white leading-tight">Seller Dashboard</p>
-                            <p className="text-[10px] text-emerald-400">Manage store & products</p>
-                          </div>
+                    <Link
+                      href="/become-seller"
+                      onClick={() => setUserDropdownOpen(false)}
+                      className="flex items-center justify-between p-2.5 rounded-xl bg-gradient-to-r from-amber-950/50 via-orange-950/40 to-yellow-950/50 hover:from-amber-900/60 hover:to-orange-900/50 text-amber-200 border border-amber-500/30 shadow-md shadow-amber-500/10 transition group"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center">
+                          <Briefcase className="w-4 h-4" />
                         </div>
-                        <ArrowRight className="w-3.5 h-3.5 text-emerald-400 group-hover:translate-x-0.5 transition-transform" />
-                      </Link>
-                    ) : (
-                      <Link
-                        href="/become-seller"
-                        onClick={() => setUserDropdownOpen(false)}
-                        className="flex items-center justify-between p-2.5 rounded-xl bg-gradient-to-r from-amber-950/50 via-orange-950/40 to-yellow-950/50 hover:from-amber-900/60 hover:to-orange-900/50 text-amber-200 border border-amber-500/30 shadow-md shadow-amber-500/10 transition group"
-                      >
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center">
-                            <Briefcase className="w-4 h-4" />
+                        <div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-bold text-white leading-tight">Become a Seller</span>
+                            <span className="text-[9px] bg-amber-400 text-black px-1.5 py-0.2 rounded font-extrabold">NEW</span>
                           </div>
-                          <div>
-                            <div className="flex items-center gap-1.5">
-                              <span className="font-bold text-white leading-tight">Become a Seller</span>
-                              <span className="text-[9px] bg-amber-400 text-black px-1.5 py-0.2 rounded font-extrabold">NEW</span>
-                            </div>
-                            <p className="text-[10px] text-amber-300/80">Sell & earn on Luxe Cart</p>
-                          </div>
+                          <p className="text-[10px] text-amber-300/80">Sell & earn on Cartiva</p>
                         </div>
-                        <ArrowRight className="w-3.5 h-3.5 text-amber-400 group-hover:translate-x-0.5 transition-transform" />
-                      </Link>
-                    )}
+                      </div>
+                      <ArrowRight className="w-3.5 h-3.5 text-amber-400 group-hover:translate-x-0.5 transition-transform" />
+                    </Link>
 
                     <div className="border-t border-zinc-800/80 my-1.5" />
 
@@ -413,7 +389,7 @@ export const Header: React.FC = () => {
 
                     <div className="p-2 text-[11px] bg-indigo-950/40 rounded-lg border border-indigo-500/20 text-indigo-300 flex items-center gap-2">
                       <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                      <span>20% Member Coupon: LUXE20</span>
+                      <span>20% Member Coupon: CARTIVA20</span>
                     </div>
 
                     <div className="border-t border-zinc-800 my-1" />
@@ -506,24 +482,13 @@ export const Header: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Become Seller / Seller Dashboard in Mobile */}
-                  {user.isSeller || user.role === "seller" ? (
-                    <Link
-                      href="/seller/dashboard"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="w-full py-2 px-3 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 text-xs font-bold rounded-xl border border-emerald-500/30 transition flex items-center justify-center gap-2"
-                    >
-                      <Store className="w-4 h-4 text-emerald-400" /> Seller Dashboard
-                    </Link>
-                  ) : (
-                    <Link
-                      href="/become-seller"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="w-full py-2.5 px-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black text-xs font-extrabold rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20"
-                    >
-                      <Briefcase className="w-4 h-4" /> Become a Seller (Start Earning)
-                    </Link>
-                  )}
+                  <Link
+                    href="/become-seller"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="w-full py-2.5 px-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black text-xs font-extrabold rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20"
+                  >
+                    <Briefcase className="w-4 h-4" /> Become a Seller (Start Earning)
+                  </Link>
 
                   <button
                     onClick={() => {

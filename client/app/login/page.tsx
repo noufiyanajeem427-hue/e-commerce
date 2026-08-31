@@ -110,10 +110,10 @@ function LoginForm() {
             </div>
             <div className="flex flex-col">
               <span className="text-lg font-black tracking-tight bg-gradient-to-r from-white via-zinc-200 to-amber-400 bg-clip-text text-transparent">
-                LUXE CART
+                CARTIVA
               </span>
               <span className="text-[8px] font-bold tracking-widest text-indigo-400 -mt-1 uppercase">
-                Artisanal Store
+                Premium Store
               </span>
             </div>
           </Link>
@@ -136,7 +136,7 @@ function LoginForm() {
 
             <div className="relative z-10 space-y-6">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-xs font-semibold">
-                <Crown className="w-3.5 h-3.5 text-amber-400" /> Luxe VIP Privilege
+                <Crown className="w-3.5 h-3.5 text-amber-400" /> Cartiva VIP Privilege
               </div>
 
               <div className="space-y-2">
@@ -190,7 +190,7 @@ function LoginForm() {
                 ))}
               </div>
               <p className="text-[11px] text-zinc-300 italic">
-                "Luxe Cart redefined high-end online retail for me. The customer care and prompt deliveries are truly bespoke."
+                "Cartiva redefined high-end online retail for me. The customer care and prompt deliveries are truly bespoke."
               </p>
               <p className="text-[10px] font-bold text-zinc-400 mt-2">
                 — Victoria Sterling, Verified Diamond Member
@@ -204,7 +204,7 @@ function LoginForm() {
               {/* Form Title */}
               <div>
                 <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
-                  Sign In to Luxe Cart
+                  Sign In to Cartiva
                 </h1>
                 <p className="text-xs text-zinc-400 mt-1.5">
                   Enter your email and password to manage your orders and wishlist.
@@ -224,7 +224,7 @@ function LoginForm() {
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="e.g. alexander@luxecart.com"
+                      placeholder="e.g. alexander@cartiva.com"
                       className="w-full bg-zinc-950/80 border border-zinc-800 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-zinc-500 outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/30 transition"
                     />
                     <Mail className="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -296,7 +296,7 @@ function LoginForm() {
 
               {/* Link to Register */}
               <div className="pt-2 text-center text-xs text-zinc-400">
-                Don't have a Luxe Cart account?{" "}
+                Don't have a Cartiva account?{" "}
                 <Link
                   href="/register"
                   className="font-bold text-amber-400 hover:text-amber-300 transition underline underline-offset-4"
@@ -311,7 +311,7 @@ function LoginForm() {
 
       {/* Footer minimal info */}
       <footer className="w-full border-t border-zinc-900 py-4 px-6 text-center text-xs text-zinc-500">
-        <p>© 2026 LUXE CART. All encrypted transactions protected by 256-Bit SSL.</p>
+        <p>© 2026 CARTIVA. All encrypted transactions protected by 256-Bit SSL.</p>
       </footer>
     </div>
   );

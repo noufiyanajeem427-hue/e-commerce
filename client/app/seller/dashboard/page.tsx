@@ -162,7 +162,7 @@ function SellerDashboardContent() {
                   SELLER PORTAL
                 </span>
                 <span className="text-[8px] font-extrabold tracking-widest text-emerald-400 -mt-1 uppercase">
-                  Luxe Cart Verified Merchant
+                  Cartiva Verified Merchant
                 </span>
               </div>
             </Link>
@@ -488,7 +488,7 @@ function SellerDashboardContent() {
 
       {/* Footer */}
       <footer className="w-full border-t border-zinc-900 py-4 px-6 text-center text-xs text-zinc-500">
-        <p>© 2026 LUXE CART Merchant Platform. All store assets and payouts encrypted.</p>
+        <p>© 2026 CARTIVA Merchant Platform. All store assets and payouts encrypted.</p>
       </footer>
     </div>
   );

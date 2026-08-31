@@ -122,10 +122,10 @@ function RegisterForm() {
             </div>
             <div className="flex flex-col">
               <span className="text-lg font-black tracking-tight bg-gradient-to-r from-white via-zinc-200 to-amber-400 bg-clip-text text-transparent">
-                LUXE CART
+                CARTIVA
               </span>
               <span className="text-[8px] font-bold tracking-widest text-indigo-400 -mt-1 uppercase">
-                Artisanal Store
+                Premium Store
               </span>
             </div>
           </Link>
@@ -168,7 +168,7 @@ function RegisterForm() {
                   </div>
                   <div>
                     <h4 className="text-xs font-bold text-white">20% Off Welcome Voucher</h4>
-                    <p className="text-[11px] text-zinc-400">Coupon code LUXE20 activated</p>
+                    <p className="text-[11px] text-zinc-400">Coupon code CARTIVA20 activated</p>
                   </div>
                 </div>
 
@@ -378,7 +378,7 @@ function RegisterForm() {
 
               {/* Link to Login */}
               <div className="pt-2 text-center text-xs text-zinc-400">
-                Already have a Luxe Cart account?{" "}
+                Already have a Cartiva account?{" "}
                 <Link
                   href="/login"
                   className="font-bold text-amber-400 hover:text-amber-300 transition underline underline-offset-4"
@@ -393,7 +393,7 @@ function RegisterForm() {
 
       {/* Footer minimal info */}
       <footer className="w-full border-t border-zinc-900 py-4 px-6 text-center text-xs text-zinc-500">
-        <p>© 2026 LUXE CART. All rights reserved. Secure Encrypted Registration.</p>
+        <p>© 2026 CARTIVA. All rights reserved. Secure Encrypted Registration.</p>
       </footer>
     </div>
   );

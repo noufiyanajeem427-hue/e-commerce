@@ -13,9 +13,39 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "LUXE CART | Leading Premium E-Commerce Store",
+  title: "Cartiva | Modern Premium E-Commerce & Multi-Vendor Marketplace",
   description:
-    "Discover next-gen electronics, luxury apparel, modern home decor, and radiance beauty items with express shipping and exclusive discounts.",
+    "Cartiva is your premier destination for next-gen electronics, luxury apparel, modern home decor, and radiance beauty items with fast express shipping and exclusive discounts.",
+  keywords: [
+    "Cartiva",
+    "Cartiva ecommerce",
+    "online shopping",
+    "premium electronics",
+    "fashion apparel",
+    "home aesthetics",
+    "luxury marketplace",
+    "seller portal"
+  ],
+  authors: [{ name: "Cartiva Team" }],
+  openGraph: {
+    title: "Cartiva | Modern Premium E-Commerce Store",
+    description:
+      "Shop top-tier electronics, designer apparel, living decor, and premium accessories on Cartiva with guaranteed fast express delivery.",
+    url: "https://cartiva.store",
+    siteName: "Cartiva",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Cartiva | Modern Premium E-Commerce Store",
+    description:
+      "Shop top-tier electronics, designer apparel, living decor, and premium accessories on Cartiva with guaranteed fast express delivery.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
