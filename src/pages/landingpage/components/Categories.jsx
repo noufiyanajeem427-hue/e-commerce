@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const categories = [
@@ -22,6 +23,12 @@ const categories = [
 
 export default function Categories() {
   const scrollRef = useRef(null);
+  const navigate = useNavigate();
+
+  const handleCategoryClick = (categoryName) => {
+    // Navigates directly to products view filtered by category (no login needed)
+    navigate(`/brand-products?category=${encodeURIComponent(categoryName)}`);
+  };
 
   const scroll = (direction) => {
     if (scrollRef.current) {
@@ -71,6 +78,7 @@ export default function Categories() {
         {categories.map((cat) => (
           <div
             key={cat.id}
+            onClick={() => handleCategoryClick(cat.name)}
             className="flex-none flex flex-col items-center cursor-pointer group w-20 sm:w-24"
           >
             <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden mb-2 bg-slate-100 shadow-sm border border-gray-100 group-hover:scale-105 transition-transform duration-200">

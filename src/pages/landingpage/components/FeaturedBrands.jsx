@@ -14,10 +14,8 @@ export default function FeaturedBrands() {
   const navigate = useNavigate();
 
   const handleBrandClick = (brandName) => {
-    // Navigates directly to the products view for this brand
-    navigate(`/featured-brands?brand=${encodeURIComponent(brandName)}`);
-  };
-
+  navigate(`/brand-products?brand=${encodeURIComponent(brandName)}`);
+};
   return (
     <section className="py-6 px-4 bg-white max-w-7xl mx-auto">
       <div className="flex items-center justify-between mb-4">
