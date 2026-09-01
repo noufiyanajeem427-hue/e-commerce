@@ -26,9 +26,8 @@ export default function Categories() {
   const navigate = useNavigate();
 
   const handleCategoryClick = (categoryName) => {
-    // Navigates directly to products view filtered by category (no login needed)
-    navigate(`/brand-products?category=${encodeURIComponent(categoryName)}`);
-  };
+  navigate(`/all-products?category=${encodeURIComponent(categoryName)}`);
+};
 
   const scroll = (direction) => {
     if (scrollRef.current) {
