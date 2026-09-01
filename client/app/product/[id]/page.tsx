@@ -72,11 +72,13 @@ function ProductDetailContent({ id }: { id: string }) {
   };
 
   const handleBuyNow = () => {
-    const added = addToCart(product, quantity, selectedSize, selectedColor);
-    if (added) {
-      setIsCartOpen(true);
-    }
+    router.push(
+      `/checkout?productId=${encodeURIComponent(product.id)}&quantity=${quantity}&size=${encodeURIComponent(
+        selectedSize
+      )}&color=${encodeURIComponent(selectedColor)}`
+    );
   };
+
 
   const handleShare = () => {
     if (typeof window !== "undefined") {

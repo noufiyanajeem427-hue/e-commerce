@@ -68,3 +68,50 @@ export interface CartItem {
 }
 
 export type Currency = "USD" | "EUR" | "GBP" | "INR";
+
+export interface ShippingAddress {
+  fullName: string;
+  phone: string;
+  email: string;
+  streetAddress: string;
+  city: string;
+  state: string;
+  pinCode: string;
+  deliveryNotes?: string;
+}
+
+export type PaymentMethod = "upi" | "card" | "netbanking" | "wallet" | "cod";
+
+export interface OrderItem {
+  product: Product;
+  quantity: number;
+  selectedSize?: string;
+  selectedColor?: string;
+  priceAtPurchase: number;
+}
+
+export interface Order {
+  id: string;
+  items: OrderItem[];
+  subtotal: number;
+  discount: number;
+  couponApplied?: string;
+  shippingFee: number;
+  totalAmount: number;
+  currency: Currency;
+  shippingAddress: ShippingAddress;
+  paymentMethod: PaymentMethod;
+  paymentDetails: {
+    upiId?: string;
+    cardLast4?: string;
+    cardBrand?: string;
+    bankName?: string;
+    walletProvider?: string;
+    transactionId: string;
+    paymentStatus: "Completed" | "Pending" | "Failed";
+  };
+  orderStatus: "Order Placed" | "Processing" | "Packed" | "Shipped" | "Out for Delivery" | "Delivered";
+  orderDate: string;
+  estimatedDelivery: string;
+}
+

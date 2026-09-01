@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "./AuthContext";
-import { Product, CartItem, Currency } from "../types";
+import { Product, CartItem, Currency, Order } from "../types";
 import toast, { Toaster } from "react-hot-toast";
 
 const CURRENCY_RATES: Record<Currency, { rate: number; symbol: string }> = {
@@ -16,6 +16,7 @@ const CURRENCY_RATES: Record<Currency, { rate: number; symbol: string }> = {
 interface ShopContextType {
   cart: CartItem[];
   wishlist: Product[];
+  orders: Order[];
   currency: Currency;
   setCurrency: (c: Currency) => void;
   formatPrice: (amountInUSD: number) => string;
@@ -31,6 +32,8 @@ interface ShopContextType {
   isInWishlist: (productId: string) => boolean;
   totalCartCount: number;
   totalCartPriceUSD: number;
+  createOrder: (orderData: Omit<Order, "id" | "orderDate" | "orderStatus" | "estimatedDelivery">) => Order;
+  getOrderById: (orderId: string) => Order | undefined;
 }
 
 const ShopContext = createContext<ShopContextType | undefined>(undefined);
@@ -40,7 +43,8 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { isAuthenticated } = useAuth();
   const [cart, setCart] = useState<CartItem[]>([]);
   const [wishlist, setWishlist] = useState<Product[]>([]);
-  const [currency, setCurrency] = useState<Currency>("USD");
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [currency, setCurrency] = useState<Currency>("INR");
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
 
@@ -53,8 +57,15 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const savedWishlist = localStorage.getItem("luxe_wishlist");
       if (savedWishlist) setWishlist(JSON.parse(savedWishlist));
 
+      const savedOrders = localStorage.getItem("luxe_orders");
+      if (savedOrders) setOrders(JSON.parse(savedOrders));
+
       const savedCurrency = localStorage.getItem("luxe_currency") as Currency;
-      if (savedCurrency && CURRENCY_RATES[savedCurrency]) setCurrency(savedCurrency);
+      if (savedCurrency && CURRENCY_RATES[savedCurrency]) {
+        setCurrency(savedCurrency);
+      } else {
+        setCurrency("INR");
+      }
     } catch (e) {
       console.error("Error reading localStorage", e);
     }
@@ -65,11 +76,12 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       localStorage.setItem("luxe_cart", JSON.stringify(cart));
       localStorage.setItem("luxe_wishlist", JSON.stringify(wishlist));
+      localStorage.setItem("luxe_orders", JSON.stringify(orders));
       localStorage.setItem("luxe_currency", currency);
     } catch (e) {
       console.error("Error saving state to localStorage", e);
     }
-  }, [cart, wishlist, currency]);
+  }, [cart, wishlist, orders, currency]);
 
   const formatPrice = (amountInUSD: number): string => {
     const info = CURRENCY_RATES[currency] || CURRENCY_RATES.USD;
@@ -161,6 +173,46 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setCart([]);
   };
 
+  const createOrder = (
+    orderData: Omit<Order, "id" | "orderDate" | "orderStatus" | "estimatedDelivery">
+  ): Order => {
+    const randomDigits = Math.floor(100000 + Math.random() * 900000);
+    const orderId = `ORD-${randomDigits}-IN`;
+
+    const now = new Date();
+    const orderDate = now.toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+    const estDate = new Date();
+    estDate.setDate(estDate.getDate() + 3);
+    const estimatedDelivery = estDate.toLocaleDateString("en-IN", {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+
+    const newOrder: Order = {
+      ...orderData,
+      id: orderId,
+      orderDate,
+      orderStatus: "Order Placed",
+      estimatedDelivery,
+    };
+
+    setOrders((prev) => [newOrder, ...prev]);
+    return newOrder;
+  };
+
+  const getOrderById = (orderId: string): Order | undefined => {
+    return orders.find((o) => o.id.toLowerCase() === orderId.toLowerCase());
+  };
+
   const toggleWishlist = (product: Product): boolean => {
     if (!isAuthenticated) {
       toast.error("Please login to your account first to save favorites!", {
@@ -198,6 +250,7 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
       value={{
         cart,
         wishlist,
+        orders,
         currency,
         setCurrency,
         formatPrice,
@@ -213,6 +266,8 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isInWishlist,
         totalCartCount,
         totalCartPriceUSD,
+        createOrder,
+        getOrderById,
       }}
     >
       <Toaster position="bottom-right" reverseOrder={false} />
@@ -228,3 +283,4 @@ export const useShop = () => {
   }
   return context;
 };
+

@@ -1,10 +1,12 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
 import { useShop } from "../context/ShopContext";
 import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, ShieldCheck, Truck } from "lucide-react";
 
 export const CartDrawer: React.FC = () => {
+  const router = useRouter();
   const { cart, isCartOpen, setIsCartOpen, removeFromCart, updateQuantity, totalCartPriceUSD, clearCart, formatPrice } =
     useShop();
 
@@ -13,6 +15,12 @@ export const CartDrawer: React.FC = () => {
   const freeShippingThresholdUSD = 50;
   const freeShippingProgress = Math.min((totalCartPriceUSD / freeShippingThresholdUSD) * 100, 100);
   const remainingForFreeShippingUSD = Math.max(freeShippingThresholdUSD - totalCartPriceUSD, 0);
+
+  const handleProceedToCheckout = () => {
+    setIsCartOpen(false);
+    router.push("/checkout");
+  };
+
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
@@ -162,14 +170,13 @@ export const CartDrawer: React.FC = () => {
 
               <div className="space-y-2">
                 <button
-                  onClick={() => {
-                    alert("Proceeding to checkout with total: " + formatPrice(totalCartPriceUSD));
-                  }}
-                  className="w-full py-3.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-extrabold text-sm rounded-2xl shadow-xl shadow-amber-500/20 flex items-center justify-center gap-2 transition"
+                  onClick={handleProceedToCheckout}
+                  className="w-full py-3.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-extrabold text-sm rounded-2xl shadow-xl shadow-amber-500/20 flex items-center justify-center gap-2 transition cursor-pointer"
                 >
                   <span>Proceed to Checkout</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
+
 
                 <button
                   onClick={clearCart}

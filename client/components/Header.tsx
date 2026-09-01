@@ -27,6 +27,7 @@ import {
   LayoutDashboard,
   BadgeDollarSign,
   ArrowRight,
+  ChevronRight,
 } from "lucide-react";
 import { useShop } from "../context/ShopContext";
 import { useAuth } from "../context/AuthContext";
@@ -357,6 +358,18 @@ export const Header: React.FC = () => {
 
                     <div className="border-t border-zinc-800/80 my-1.5" />
 
+                    <Link
+                      href="/orders"
+                      onClick={() => setUserDropdownOpen(false)}
+                      className="flex items-center justify-between p-2 rounded-lg hover:bg-zinc-800 text-zinc-300 hover:text-white transition"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Package className="w-4 h-4 text-emerald-400" />
+                        <span>My Orders</span>
+                      </div>
+                      <ChevronRight className="w-3.5 h-3.5 text-zinc-600" />
+                    </Link>
+
                     <a
                       href="#highest-viewed"
                       onClick={() => setUserDropdownOpen(false)}
@@ -386,6 +399,7 @@ export const Header: React.FC = () => {
                         {totalCartCount} items
                       </span>
                     </button>
+
 
                     <div className="p-2 text-[11px] bg-indigo-950/40 rounded-lg border border-indigo-500/20 text-indigo-300 flex items-center gap-2">
                       <Sparkles className="w-3.5 h-3.5 text-amber-400" />

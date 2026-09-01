@@ -1,10 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useShop } from "../context/ShopContext";
-import { X, Star, ShoppingBag, Heart, ShieldCheck, Truck, Check, Flame } from "lucide-react";
+import { X, Star, ShoppingBag, Heart, ShieldCheck, Truck, Check, Flame, Sparkles } from "lucide-react";
 
 export const QuickViewModal: React.FC = () => {
+  const router = useRouter();
   const { quickViewProduct, setQuickViewProduct, addToCart, toggleWishlist, isInWishlist, formatPrice } = useShop();
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState("M");
@@ -21,6 +23,16 @@ export const QuickViewModal: React.FC = () => {
       setQuickViewProduct(null);
     }
   };
+
+  const handleBuyNow = () => {
+    setQuickViewProduct(null);
+    router.push(
+      `/checkout?productId=${encodeURIComponent(product.id)}&quantity=${quantity}&size=${encodeURIComponent(
+        selectedSize
+      )}&color=${encodeURIComponent(selectedColor)}`
+    );
+  };
+
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
@@ -146,17 +158,34 @@ export const QuickViewModal: React.FC = () => {
 
               {/* Actions */}
               <div className="flex flex-col gap-2 pt-2">
-                <div className="flex gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   <button
                     onClick={handleAddToCart}
-                    className="flex-1 py-3 bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs rounded-xl shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2 transition"
+                    className="py-3 px-3 bg-amber-500 hover:bg-amber-400 text-black font-black text-xs rounded-xl shadow-lg shadow-amber-500/20 flex items-center justify-center gap-1.5 transition cursor-pointer"
                   >
-                    <ShoppingBag className="w-4 h-4 text-black" /> Add to Cart ({formatPrice(product.price * quantity)})
+                    <ShoppingBag className="w-4 h-4 text-black" /> Add to Cart
                   </button>
 
                   <button
+                    onClick={handleBuyNow}
+                    className="py-3 px-3 bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs rounded-xl shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-1.5 transition cursor-pointer"
+                  >
+                    <Sparkles className="w-4 h-4 text-black" /> Buy Now ({formatPrice(product.price * quantity)})
+                  </button>
+                </div>
+
+                <div className="flex gap-2">
+                  <a
+                    href={`/product/${product.id}`}
+                    onClick={() => setQuickViewProduct(null)}
+                    className="flex-1 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 hover:text-white font-bold text-xs rounded-xl border border-zinc-800 text-center transition"
+                  >
+                    View Full Product Page →
+                  </a>
+
+                  <button
                     onClick={() => toggleWishlist(product)}
-                    className={`p-3 rounded-xl border transition ${
+                    className={`p-2.5 rounded-xl border transition ${
                       isWish
                         ? "bg-rose-500 text-white border-rose-400"
                         : "bg-zinc-900 text-zinc-300 border-zinc-800 hover:text-rose-400"
@@ -166,15 +195,8 @@ export const QuickViewModal: React.FC = () => {
                     <Heart className={`w-4 h-4 ${isWish ? "fill-white" : ""}`} />
                   </button>
                 </div>
-
-                <a
-                  href={`/product/${product.id}`}
-                  onClick={() => setQuickViewProduct(null)}
-                  className="w-full py-2.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 hover:text-white font-bold text-xs rounded-xl border border-zinc-800 text-center transition"
-                >
-                  View Full Product Page →
-                </a>
               </div>
+
 
               <div className="flex items-center justify-between text-[10px] text-zinc-400 pt-2 border-t border-zinc-900">
                 <span className="flex items-center gap-1">
