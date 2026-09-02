@@ -12,9 +12,9 @@ const newArrivals = [
   },
   {
     id: 2,
-    category: 'Fashion',
-    title: 'Texas Instruments TI-84 Plus CE Graphing Calculator',
-    price: '₹11999.00',
+    category: 'Books & Stationaries',
+    title: 'Legends of Great China',
+    price: '₹499.00',
     rating: '4.8',
     image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=500&q=80',
     description: 'Full-color high-resolution backlit display graphing calculator for math and science.'
