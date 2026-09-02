@@ -23,6 +23,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    // Newsletter Subscription Flag
+    isSubscribed: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
