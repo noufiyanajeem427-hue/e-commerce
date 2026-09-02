@@ -1,7 +1,7 @@
 const express = require("express");//express is a web application framework for Node.js that simplifies the process of building web applications and APIs. It provides a set of features and tools for handling HTTP requests, routing, middleware, and more.
 const dotenv = require("dotenv");
 const cors = require("cors");//cors is a middleware for Express.js that enables Cross-Origin Resource Sharing (CORS). CORS is a security feature implemented by web browsers that restricts web pages from making requests to a different domain than the one that served the web page. The cors middleware allows you to configure and enable CORS for your Express application, allowing it to handle requests from different origins.
-const connectDB = require("./config/db");
+const connectDB = require("./config/db");//connect 
 
 dotenv.config();
 
