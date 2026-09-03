@@ -47,8 +47,9 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [currency, setCurrency] = useState<Currency>("INR");
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
+  const [isHydrated, setIsHydrated] = useState(false);
 
-  // Load saved state from localStorage if available
+  // Load saved state from localStorage on mount
   useEffect(() => {
     try {
       const savedCart = localStorage.getItem("luxe_cart");
@@ -68,11 +69,14 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     } catch (e) {
       console.error("Error reading localStorage", e);
+    } finally {
+      setIsHydrated(true);
     }
   }, []);
 
-  // Sync to localStorage
+  // Sync to localStorage ONLY AFTER hydration is complete
   useEffect(() => {
+    if (!isHydrated) return;
     try {
       localStorage.setItem("luxe_cart", JSON.stringify(cart));
       localStorage.setItem("luxe_wishlist", JSON.stringify(wishlist));
@@ -81,7 +85,7 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (e) {
       console.error("Error saving state to localStorage", e);
     }
-  }, [cart, wishlist, orders, currency]);
+  }, [cart, wishlist, orders, currency, isHydrated]);
 
   const formatPrice = (amountInUSD: number): string => {
     const info = CURRENCY_RATES[currency] || CURRENCY_RATES.USD;
@@ -205,12 +209,36 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
       estimatedDelivery,
     };
 
+    // Update state
     setOrders((prev) => [newOrder, ...prev]);
+
+    // Synchronously write to localStorage so navigating away never drops the order
+    try {
+      const savedRaw = localStorage.getItem("luxe_orders");
+      const existingList: Order[] = savedRaw ? JSON.parse(savedRaw) : [];
+      const updatedList = [newOrder, ...existingList.filter((o) => o.id !== newOrder.id)];
+      localStorage.setItem("luxe_orders", JSON.stringify(updatedList));
+    } catch (e) {
+      console.error("Error writing new order to localStorage", e);
+    }
+
     return newOrder;
   };
 
   const getOrderById = (orderId: string): Order | undefined => {
-    return orders.find((o) => o.id.toLowerCase() === orderId.toLowerCase());
+    const foundInState = orders.find((o) => o.id.toLowerCase() === orderId.toLowerCase());
+    if (foundInState) return foundInState;
+
+    try {
+      const raw = localStorage.getItem("luxe_orders");
+      if (raw) {
+        const storedOrders: Order[] = JSON.parse(raw);
+        return storedOrders.find((o) => o.id.toLowerCase() === orderId.toLowerCase());
+      }
+    } catch (e) {
+      console.error("Error finding order in localStorage", e);
+    }
+    return undefined;
   };
 
   const toggleWishlist = (product: Product): boolean => {

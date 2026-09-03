@@ -496,13 +496,22 @@ export const Header: React.FC = () => {
                     </div>
                   </div>
 
-                  <Link
-                    href="/become-seller"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="w-full py-2.5 px-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black text-xs font-extrabold rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20"
-                  >
-                    <Briefcase className="w-4 h-4" /> Become a Seller (Start Earning)
-                  </Link>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Link
+                      href="/orders"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="py-2 px-3 bg-zinc-800 hover:bg-zinc-700 text-center text-xs font-bold text-white rounded-xl transition flex items-center justify-center gap-1.5"
+                    >
+                      <Package className="w-3.5 h-3.5 text-emerald-400" /> My Orders
+                    </Link>
+                    <Link
+                      href="/become-seller"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="py-2 px-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black text-xs font-extrabold rounded-xl transition flex items-center justify-center gap-1.5 shadow-md shadow-amber-500/20"
+                    >
+                      <Briefcase className="w-3.5 h-3.5" /> Seller Hub
+                    </Link>
+                  </div>
 
                   <button
                     onClick={() => {

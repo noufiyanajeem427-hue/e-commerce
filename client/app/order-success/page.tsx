@@ -102,6 +102,13 @@ function OrderSuccessContent() {
 
         {/* Action button bar */}
         <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+          <Link
+            href="/orders"
+            className="px-5 py-2.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 hover:text-white font-bold text-xs flex items-center gap-2 transition shadow-lg"
+          >
+            <Package className="w-4 h-4 text-emerald-400" /> View My Orders
+          </Link>
+
           <button
             onClick={handlePrint}
             className="px-5 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 hover:text-white font-bold text-xs flex items-center gap-2 transition"

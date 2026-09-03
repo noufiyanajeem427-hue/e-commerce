@@ -1,11 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useShop } from "../../context/ShopContext";
 import { Header } from "../../components/Header";
 import { Footer } from "../../components/Footer";
 import { Providers } from "../../components/Providers";
+import { Order } from "../../types";
 import {
   Package,
   Truck,
@@ -15,12 +16,38 @@ import {
   CheckCircle2,
   ChevronRight,
   ShieldCheck,
+  Loader2,
 } from "lucide-react";
 
 function OrdersContent() {
-  const { orders, formatPrice } = useShop();
+  const { orders: contextOrders, formatPrice } = useShop();
+  const [mounted, setMounted] = useState(false);
+  const [localOrders, setLocalOrders] = useState<Order[]>([]);
 
-  if (orders.length === 0) {
+  useEffect(() => {
+    setMounted(true);
+    try {
+      const saved = localStorage.getItem("luxe_orders");
+      if (saved) {
+        setLocalOrders(JSON.parse(saved));
+      }
+    } catch (e) {
+      console.error("Error reading saved orders", e);
+    }
+  }, []);
+
+  // Merge context and local orders, prioritizing context if non-empty
+  const displayOrders = contextOrders.length > 0 ? contextOrders : localOrders;
+
+  if (!mounted) {
+    return (
+      <div className="min-h-[50vh] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-amber-400 animate-spin" />
+      </div>
+    );
+  }
+
+  if (displayOrders.length === 0) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-20 text-center">
         <div className="w-20 h-20 mx-auto rounded-3xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-amber-400 mb-6 shadow-2xl">
@@ -61,12 +88,12 @@ function OrdersContent() {
           </p>
         </div>
         <div className="text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-3.5 py-1.5 rounded-full self-start sm:self-auto">
-          {orders.length} {orders.length === 1 ? "Order Placed" : "Orders Placed"}
+          {displayOrders.length} {displayOrders.length === 1 ? "Order Placed" : "Orders Placed"}
         </div>
       </div>
 
       <div className="space-y-6">
-        {orders.map((order) => (
+        {displayOrders.map((order) => (
           <div
             key={order.id}
             className="glass-card rounded-3xl border border-zinc-800 overflow-hidden divide-y divide-zinc-800 transition hover:border-zinc-700"
