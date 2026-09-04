@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Bot, X, Send, Loader2 } from 'lucide-react';
+import { WandSparkles as Wand, X, Send, Loader2 } from 'lucide-react';
 
 export default function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
@@ -19,7 +19,6 @@ export default function ChatWidget() {
     setLoading(true);
 
     try {
-      // Changed to full backend URL
       const res = await fetch('http://localhost:5000/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -45,7 +44,7 @@ export default function ChatWidget() {
           onClick={() => setIsOpen(true)}
           className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-5 rounded-full shadow-2xl flex items-center gap-2 text-sm transition transform hover:scale-105 cursor-pointer"
         >
-          <Bot className="w-5 h-5" />
+          <Wand className="w-5 h-5" />
           <span>Ask AI</span>
         </button>
       )}
@@ -55,7 +54,7 @@ export default function ChatWidget() {
           <div className="bg-indigo-600 p-4 text-white flex justify-between items-center">
             <div className="flex items-center gap-2">
               <div className="p-1.5 bg-white/20 rounded-xl">
-                <Bot className="w-5 h-5" />
+                <Wand className="w-5 h-5" />
               </div>
               <div>
                 <h3 className="font-extrabold text-sm leading-none">Cartiva AI</h3>
