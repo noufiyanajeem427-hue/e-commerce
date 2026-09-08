@@ -1,5 +1,4 @@
 import React from 'react';
-
 const OrderRow = ({ orderId, customer, total, status }) => {
   return (
     <tr>
@@ -10,5 +9,4 @@ const OrderRow = ({ orderId, customer, total, status }) => {
     </tr>
   );
 };
-
 export default OrderRow;
