@@ -1,12 +1,16 @@
 "use client";
 
-import React, { Suspense } from "react";
+import React, { Suspense, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useShop } from "../../context/ShopContext";
 import { Header } from "../../components/Header";
 import { Footer } from "../../components/Footer";
 import { Providers } from "../../components/Providers";
+import { InvoiceModal } from "../../components/InvoiceModal";
+import { InvoiceView } from "../../components/InvoiceView";
+import { downloadInvoicePdf } from "../../lib/generateInvoicePdf";
+import toast from "react-hot-toast";
 import {
   CheckCircle2,
   Package,
@@ -21,25 +25,59 @@ import {
   ShoppingBag,
   ArrowRight,
   ShieldCheck,
-  Calendar,
-  Clock,
   Sparkles,
   Phone,
   Mail,
   Loader2,
+  Download,
+  FileText,
+  Eye,
+  Check,
 } from "lucide-react";
 
 function OrderSuccessContent() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get("orderId");
   const { orders, getOrderById, formatPrice } = useShop();
+  const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
 
   const order = orderId ? getOrderById(orderId) : orders[0];
 
-  const handlePrint = () => {
-    if (typeof window !== "undefined") {
-      window.print();
+  const handleDownloadPdf = async () => {
+    if (!order) return;
+    try {
+      setIsDownloadingPdf(true);
+      toast.loading("Preparing high-definition PDF invoice...", {
+        id: "pdf-success-page",
+      });
+
+      const success = await downloadInvoicePdf(
+        `success-hidden-invoice-${order.id}`,
+        order.id,
+        `Cartiva_Tax_Invoice_${order.id}.pdf`
+      );
+
+      if (success) {
+        toast.success("PDF Invoice downloaded successfully!", {
+          id: "pdf-success-page",
+          icon: "📄",
+        });
+      } else {
+        toast.error("Failed to generate PDF. You can also print it.", {
+          id: "pdf-success-page",
+        });
+      }
+    } catch (e) {
+      console.error("PDF generation failed:", e);
+      toast.error("Could not download invoice PDF.", { id: "pdf-success-page" });
+    } finally {
+      setIsDownloadingPdf(false);
     }
+  };
+
+  const handlePrint = () => {
+    setIsInvoiceModalOpen(true);
   };
 
   if (!order) {
@@ -95,33 +133,85 @@ function OrderSuccessContent() {
             Thank You for Your Purchase!
           </h1>
           <p className="text-zinc-400 text-sm max-w-lg mx-auto mt-1">
-            Your payment has been authorized and your order is confirmed. A receipt has been sent to{" "}
+            Your payment has been authorized and your order is confirmed. A receipt and tax invoice have been generated for{" "}
             <span className="text-amber-400 font-semibold">{order.shippingAddress.email}</span>.
           </p>
         </div>
 
         {/* Action button bar */}
         <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+          <button
+            onClick={handleDownloadPdf}
+            disabled={isDownloadingPdf}
+            className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs flex items-center gap-2 shadow-xl glow-gold transition cursor-pointer disabled:opacity-50"
+          >
+            {isDownloadingPdf ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" /> Generating PDF...
+              </>
+            ) : (
+              <>
+                <Download className="w-4 h-4" /> Download PDF Invoice
+              </>
+            )}
+          </button>
+
+          <button
+            onClick={() => setIsInvoiceModalOpen(true)}
+            className="px-5 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 hover:text-white font-bold text-xs flex items-center gap-2 transition cursor-pointer"
+          >
+            <Eye className="w-4 h-4 text-amber-400" /> View Tax Invoice
+          </button>
+
           <Link
             href="/orders"
             className="px-5 py-2.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 hover:text-white font-bold text-xs flex items-center gap-2 transition shadow-lg"
           >
-            <Package className="w-4 h-4 text-emerald-400" /> View My Orders
+            <Package className="w-4 h-4 text-emerald-400" /> My Orders
           </Link>
-
-          <button
-            onClick={handlePrint}
-            className="px-5 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 hover:text-white font-bold text-xs flex items-center gap-2 transition"
-          >
-            <Printer className="w-4 h-4" /> Download / Print Invoice
-          </button>
 
           <Link
             href="/"
-            className="px-6 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs flex items-center gap-2 shadow-lg glow-gold transition"
+            className="px-5 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 hover:text-white font-bold text-xs flex items-center gap-1.5 transition"
           >
             <ShoppingBag className="w-4 h-4" /> Continue Shopping <ArrowRight className="w-3.5 h-3.5" />
           </Link>
+        </div>
+      </div>
+
+      {/* Official Tax Invoice Quick Feature Banner */}
+      <div className="mb-8 p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-amber-500/10 via-emerald-500/10 to-indigo-500/10 border border-amber-500/30 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0 shadow-inner">
+            <FileText className="w-6 h-6" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="text-sm font-extrabold text-white">GST Tax Invoice Ready</h3>
+              <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase">
+                Original Recipient Copy
+              </span>
+            </div>
+            <p className="text-xs text-zinc-400 mt-0.5">
+              Invoice #{order.id} with complete HSN codes, GST breakdown, QR authenticity seal, and digital signature.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <button
+            onClick={() => setIsInvoiceModalOpen(true)}
+            className="flex-1 sm:flex-initial px-4 py-2 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 hover:text-white font-bold text-xs flex items-center justify-center gap-1.5 transition cursor-pointer"
+          >
+            <Printer className="w-3.5 h-3.5" /> Preview & Print
+          </button>
+          <button
+            onClick={handleDownloadPdf}
+            disabled={isDownloadingPdf}
+            className="flex-1 sm:flex-initial px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-md transition cursor-pointer"
+          >
+            <Download className="w-3.5 h-3.5" /> PDF
+          </button>
         </div>
       </div>
 
@@ -297,6 +387,18 @@ function OrderSuccessContent() {
           </div>
         </div>
       </div>
+
+      {/* Hidden Invoice DOM container for razor-sharp background PDF generation */}
+      <div style={{ position: "absolute", left: "-9999px", top: "-9999px", opacity: 0, pointerEvents: "none" }}>
+        <InvoiceView order={order} id={`success-hidden-invoice-${order.id}`} />
+      </div>
+
+      {/* Interactive Invoice Modal */}
+      <InvoiceModal
+        order={order}
+        isOpen={isInvoiceModalOpen}
+        onClose={() => setIsInvoiceModalOpen(false)}
+      />
     </div>
   );
 }
