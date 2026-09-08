@@ -10,6 +10,7 @@ import { DiscountSlider } from "../components/DiscountSlider";
 import { RandomProducts } from "../components/RandomProducts";
 import { Testimonials } from "../components/Testimonials";
 import { Footer } from "../components/Footer";
+import { ChatWidget } from "../components/ChatWidget";
 
 export default function Home() {
   return (
@@ -46,6 +47,9 @@ export default function Home() {
 
         {/* 10. Footer */}
         <Footer />
+
+        {/* 11. AI Chatbot Widget */}
+        <ChatWidget />
       </div>
     </Providers>
   );
