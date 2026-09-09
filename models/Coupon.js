@@ -6,7 +6,6 @@ const couponSchema = new mongoose.Schema(
             type: String,
             required: true,
             unique: true,
-            index: true,
             minlength: 3,
             maxlength: 20,
             uppercase: true,

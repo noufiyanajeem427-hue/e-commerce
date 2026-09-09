@@ -50,7 +50,6 @@ const productSchema = new mongoose.Schema(
         slug: {
             type: String,
             unique: true,
-            index: true,
             lowercase: true,
             trim: true
         },
@@ -180,4 +179,4 @@ productSchema.index({
 productSchema.index({ isActive: 1, isFeatured: 1 });
 productSchema.index({ isActive: 1, price: 1 });
 
-module.exports = mongoose.model("Product", productSchema);
+module.exports = mongoose.model("Product", productSchema);//product model
