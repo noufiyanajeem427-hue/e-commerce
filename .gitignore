@@ -4,10 +4,7 @@ node_modules/
 
 # Production builds
 dist/
-build/
-out/
 
-# Environment variables (security sensitive)
 .env
 .env.local
 .env.development.local
