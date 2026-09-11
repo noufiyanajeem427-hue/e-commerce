@@ -25,7 +25,7 @@ export const HighestViewed: React.FC = () => {
             </h2>
           </div>
           <p className="text-xs text-slate-400 max-w-md leading-relaxed">
-            Premier products experiencing maximum shopper engagement and real-time product views today.
+            Premier products experiencing maximum shopper engagement and top buyer ratings.
           </p>
         </div>
 
