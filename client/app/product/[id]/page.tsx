@@ -133,11 +133,10 @@ function ProductDetailContent({ id }: { id: string }) {
               <button
                 onClick={() => toggleWishlist(product)}
                 aria-label="Wishlist"
-                className={`p-3 rounded-2xl backdrop-blur-md border transition shadow-lg ${
-                  isWish
-                    ? "bg-rose-500/90 text-white border-rose-400 shadow-rose-500/30"
-                    : "bg-black/60 text-zinc-300 border-white/10 hover:bg-black/80 hover:text-rose-400"
-                }`}
+                className={`p-3 rounded-2xl backdrop-blur-md border transition shadow-lg ${isWish
+                  ? "bg-rose-500/90 text-white border-rose-400 shadow-rose-500/30"
+                  : "bg-black/60 text-zinc-300 border-white/10 hover:bg-black/80 hover:text-rose-400"
+                  }`}
               >
                 <Heart className={`w-5 h-5 ${isWish ? "fill-white" : ""}`} />
               </button>
@@ -165,11 +164,10 @@ function ProductDetailContent({ id }: { id: string }) {
               <button
                 key={i}
                 onClick={() => setSelectedImage(img)}
-                className={`relative w-20 h-20 rounded-2xl overflow-hidden border-2 transition ${
-                  selectedImage === img
-                    ? "border-amber-400 ring-2 ring-amber-400/20"
-                    : "border-zinc-800 opacity-60 hover:opacity-100"
-                }`}
+                className={`relative w-20 h-20 rounded-2xl overflow-hidden border-2 transition ${selectedImage === img
+                  ? "border-amber-400 ring-2 ring-amber-400/20"
+                  : "border-zinc-800 opacity-60 hover:opacity-100"
+                  }`}
               >
                 <img src={img} alt="" className="w-full h-full object-cover" />
               </button>
@@ -229,11 +227,10 @@ function ProductDetailContent({ id }: { id: string }) {
                     <button
                       key={i}
                       onClick={() => setSelectedColor(c)}
-                      className={`w-9 h-9 rounded-full border-2 transition-all flex items-center justify-center ${
-                        selectedColor === c
-                          ? "border-amber-400 scale-110 shadow-lg shadow-amber-400/20"
-                          : "border-zinc-700 hover:border-zinc-500"
-                      }`}
+                      className={`w-9 h-9 rounded-full border-2 transition-all flex items-center justify-center ${selectedColor === c
+                        ? "border-amber-400 scale-110 shadow-lg shadow-amber-400/20"
+                        : "border-zinc-700 hover:border-zinc-500"
+                        }`}
                       style={{ backgroundColor: c }}
                     >
                       {selectedColor === c && (
@@ -257,11 +254,10 @@ function ProductDetailContent({ id }: { id: string }) {
                     <button
                       key={s}
                       onClick={() => setSelectedSize(s)}
-                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-                        selectedSize === s
-                          ? "bg-amber-400 text-slate-950 font-black shadow-md glow-gold"
-                          : "bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800"
-                      }`}
+                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${selectedSize === s
+                        ? "bg-amber-400 text-slate-950 font-black shadow-md glow-gold"
+                        : "bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800"
+                        }`}
                     >
                       {s}
                     </button>
@@ -293,14 +289,14 @@ function ProductDetailContent({ id }: { id: string }) {
                     +
                   </button>
                 </div>
-                {product.inStock ? (
+                {/* {product.inStock ? (
                   <span className="text-xs text-emerald-400 font-semibold flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
                     In Stock (Ready to Ship)
                   </span>
                 ) : (
                   <span className="text-xs text-rose-400 font-semibold">Out of Stock</span>
-                )}
+                )} */}
               </div>
             </div>
 
@@ -351,11 +347,10 @@ function ProductDetailContent({ id }: { id: string }) {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`pb-2 px-2 text-sm font-bold transition border-b-2 ${
-                activeTab === tab.id
-                  ? "text-amber-400 border-amber-400"
-                  : "text-zinc-500 border-transparent hover:text-zinc-300"
-              }`}
+              className={`pb-2 px-2 text-sm font-bold transition border-b-2 ${activeTab === tab.id
+                ? "text-amber-400 border-amber-400"
+                : "text-zinc-500 border-transparent hover:text-zinc-300"
+                }`}
             >
               {tab.label}
             </button>
