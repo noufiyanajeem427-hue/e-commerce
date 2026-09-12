@@ -122,7 +122,7 @@ const addToCart = async (req, res) => {
 
         await cart.populate("items.product");
 
-        res.status(200).json({
+        res.status(200).json({//stats of cart
             success: true,
             message: "Product added to cart",
             cart
