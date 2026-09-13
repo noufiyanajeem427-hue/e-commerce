@@ -11,7 +11,7 @@ const imageSchema = new mongoose.Schema({
     },
     isMain: {
         type: Boolean,
-        default: false
+        default: false//false product image is not main image
     }
 });
 
