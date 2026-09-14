@@ -24,11 +24,17 @@ interface ShopContextType {
   setIsCartOpen: (open: boolean) => void;
   quickViewProduct: Product | null;
   setQuickViewProduct: (product: Product | null) => void;
-  addToCart: (product: Product, quantity?: number, selectedSize?: string, selectedColor?: string) => boolean;
+  addToCart: (
+    product: Product,
+    quantity?: number,
+    selectedSize?: string,
+    selectedColor?: string,
+    redirectUrl?: string
+  ) => boolean;
   removeFromCart: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
-  toggleWishlist: (product: Product) => boolean;
+  toggleWishlist: (product: Product, redirectUrl?: string) => boolean;
   isInWishlist: (productId: string) => boolean;
   totalCartCount: number;
   totalCartPriceUSD: number;
@@ -101,14 +107,19 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
     product: Product,
     quantity = 1,
     selectedSize?: string,
-    selectedColor?: string
+    selectedColor?: string,
+    redirectUrl?: string
   ): boolean => {
     if (!isAuthenticated) {
       toast.error("Please login to your account first to add items to cart!", {
         icon: "🔒",
         duration: 3500,
       });
-      router.push("/login");
+      const currentUrl = typeof window !== "undefined"
+        ? `${window.location.pathname}${window.location.search}`
+        : "/";
+      const target = redirectUrl || currentUrl;
+      router.push(`/login?redirect=${encodeURIComponent(target)}`);
       return false;
     }
 
@@ -241,13 +252,17 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return undefined;
   };
 
-  const toggleWishlist = (product: Product): boolean => {
+  const toggleWishlist = (product: Product, redirectUrl?: string): boolean => {
     if (!isAuthenticated) {
       toast.error("Please login to your account first to save favorites!", {
         icon: "🔒",
         duration: 3500,
       });
-      router.push("/login");
+      const currentUrl = typeof window !== "undefined"
+        ? `${window.location.pathname}${window.location.search}`
+        : "/";
+      const target = redirectUrl || currentUrl;
+      router.push(`/login?redirect=${encodeURIComponent(target)}`);
       return false;
     }
 

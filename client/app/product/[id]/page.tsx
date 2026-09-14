@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, use } from "react";
+import React, { useState, useEffect, use, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Providers } from "../../../components/Providers";
 import { Header } from "../../../components/Header";
 import { Footer } from "../../../components/Footer";
@@ -32,14 +32,34 @@ interface PageProps {
 
 function ProductDetailContent({ id }: { id: string }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const product = getProductByIdOrSlug(id);
   const { addToCart, toggleWishlist, isInWishlist, formatPrice, setIsCartOpen } = useShop();
 
+  const paramSize = searchParams.get("size");
+  const paramColor = searchParams.get("color");
+  const paramQty = searchParams.get("quantity") || searchParams.get("qty");
+
   const [selectedImage, setSelectedImage] = useState<string>(product?.image || "");
-  const [selectedColor, setSelectedColor] = useState<string>(product?.colors?.[0] || "Default");
-  const [selectedSize, setSelectedSize] = useState<string>(product?.sizes?.[0] || "M");
-  const [quantity, setQuantity] = useState<number>(1);
+  const [selectedColor, setSelectedColor] = useState<string>(
+    paramColor || product?.colors?.[0] || "Default"
+  );
+  const [selectedSize, setSelectedSize] = useState<string>(
+    paramSize || product?.sizes?.[0] || "M"
+  );
+  const [quantity, setQuantity] = useState<number>(
+    paramQty ? Math.max(1, parseInt(paramQty, 10) || 1) : 1
+  );
   const [activeTab, setActiveTab] = useState<"overview" | "specs" | "reviews">("overview");
+
+  useEffect(() => {
+    if (paramSize) setSelectedSize(paramSize);
+    if (paramColor) setSelectedColor(paramColor);
+    if (paramQty) {
+      const q = parseInt(paramQty, 10);
+      if (!isNaN(q) && q > 0) setQuantity(q);
+    }
+  }, [paramSize, paramColor, paramQty]);
 
   if (!product) {
     return (
@@ -67,8 +87,21 @@ function ProductDetailContent({ id }: { id: string }) {
     .filter((p) => p.id !== product.id && p.category === product.category)
     .slice(0, 4);
 
+  const getProductRedirectUrl = () => {
+    const params = new URLSearchParams();
+    if (selectedSize) params.set("size", selectedSize);
+    if (selectedColor) params.set("color", selectedColor);
+    if (quantity > 1) params.set("qty", quantity.toString());
+    const query = params.toString();
+    return `/product/${product.id}${query ? `?${query}` : ""}`;
+  };
+
   const handleAddToCart = () => {
-    addToCart(product, quantity, selectedSize, selectedColor);
+    addToCart(product, quantity, selectedSize, selectedColor, getProductRedirectUrl());
+  };
+
+  const handleToggleWishlist = () => {
+    toggleWishlist(product, getProductRedirectUrl());
   };
 
   const handleBuyNow = () => {
@@ -131,7 +164,7 @@ function ProductDetailContent({ id }: { id: string }) {
             {/* Wishlist & Share floating actions */}
             <div className="absolute top-4 right-4 flex flex-col gap-2 z-10">
               <button
-                onClick={() => toggleWishlist(product)}
+                onClick={handleToggleWishlist}
                 aria-label="Wishlist"
                 className={`p-3 rounded-2xl backdrop-blur-md border transition shadow-lg ${isWish
                   ? "bg-rose-500/90 text-white border-rose-400 shadow-rose-500/30"
@@ -463,7 +496,9 @@ export default function ProductDetailPage({ params }: PageProps) {
       <div className="min-h-screen bg-[#090D16] text-slate-100 font-sans selection:bg-amber-500 selection:text-slate-950 flex flex-col justify-between">
         <Header />
         <main className="flex-1">
-          <ProductDetailContent id={resolvedParams.id} />
+          <Suspense fallback={<div className="min-h-[70vh] flex items-center justify-center text-white">Loading product details...</div>}>
+            <ProductDetailContent id={resolvedParams.id} />
+          </Suspense>
         </main>
         <Footer />
       </div>

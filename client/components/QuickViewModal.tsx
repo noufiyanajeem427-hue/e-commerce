@@ -17,8 +17,17 @@ export const QuickViewModal: React.FC = () => {
   const product = quickViewProduct;
   const isWish = isInWishlist(product.id);
 
+  const getProductRedirectUrl = () => {
+    const params = new URLSearchParams();
+    if (selectedSize) params.set("size", selectedSize);
+    if (selectedColor) params.set("color", selectedColor);
+    if (quantity > 1) params.set("qty", quantity.toString());
+    const query = params.toString();
+    return `/product/${product.id}${query ? `?${query}` : ""}`;
+  };
+
   const handleAddToCart = () => {
-    const added = addToCart(product, quantity, selectedSize, selectedColor);
+    const added = addToCart(product, quantity, selectedSize, selectedColor, getProductRedirectUrl());
     if (added) {
       setQuickViewProduct(null);
     }

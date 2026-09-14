@@ -2,7 +2,7 @@
 
 import React, { useState, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Sparkles,
   User,
@@ -27,6 +27,8 @@ import { Providers } from "../../components/Providers";
 
 function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get("redirect") || "/";
   const { register, demoLogin, isAuthenticated, user } = useAuth();
 
   const [name, setName] = useState("");
@@ -70,7 +72,7 @@ function RegisterForm() {
             </p>
           </div>
           <button
-            onClick={() => router.push("/")}
+            onClick={() => router.push(redirectUrl)}
             className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-bold text-sm transition shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2"
           >
             Go to Store <ArrowRight className="w-4 h-4" />
@@ -107,7 +109,7 @@ function RegisterForm() {
     setIsSubmitting(false);
 
     if (success) {
-      router.push("/");
+      router.push(redirectUrl);
     }
   };
 
@@ -380,7 +382,7 @@ function RegisterForm() {
               <div className="pt-2 text-center text-xs text-zinc-400">
                 Already have a Cartiva account?{" "}
                 <Link
-                  href="/login"
+                  href={redirectUrl && redirectUrl !== "/" ? `/login?redirect=${encodeURIComponent(redirectUrl)}` : "/login"}
                   className="font-bold text-amber-400 hover:text-amber-300 transition underline underline-offset-4"
                 >
                   Sign In here
