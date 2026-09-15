@@ -22,7 +22,7 @@ router.get("/", getCart);
 router.post("/", addToCart);
 
 // Update cart item quantity
-router.put("/:itemId", updateCartItem);
+router.put("/:itemId", updateCartItem);//cart
 
 // Remove item from cart
 router.delete("/:itemId", removeFromCart);
