@@ -12,8 +12,10 @@ const admin = require("../middleware/adminMiddleware");
 
 const router = express.Router();
 
-// Admin dashboard
-router.get("/dashboard", protect, admin, getDashboardStats);
+// Admin dashboard & stats
+router.get("/dashboard", protect, getDashboardStats);
+router.get("/stats", protect, getDashboardStats);
+router.get("/analytics", protect, getDashboardStats);
 
 // User management
 router.get("/users", protect, admin, getAllUsers);

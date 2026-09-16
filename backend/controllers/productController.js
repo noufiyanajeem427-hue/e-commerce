@@ -1,4 +1,6 @@
+const mongoose = require("mongoose");
 const Product = require("../models/Product");
+const Category = require("../models/Category");
 
 // =========================
 // CREATE PRODUCT
@@ -31,6 +33,31 @@ const createProduct = async (req, res) => {
                 success: false,
                 message: "Name, description, price and category are required"
             });
+        }
+
+        // Auto resolve category to ObjectId
+        let categoryId = category;
+        if (category && (!mongoose.Types.ObjectId.isValid(category) || typeof category === "string")) {
+            let catDoc = null;
+            if (mongoose.Types.ObjectId.isValid(category)) {
+                catDoc = await Category.findById(category);
+            }
+            if (!catDoc) {
+                catDoc = await Category.findOne({
+                    $or: [
+                        { name: new RegExp(`^${category}$`, "i") },
+                        { slug: new RegExp(`^${category}$`, "i") }
+                    ]
+                });
+            }
+            if (!catDoc) {
+                const catSlug = typeof category === "string" ? category.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") : "general";
+                catDoc = await Category.create({
+                    name: typeof category === "string" ? category : "General",
+                    slug: catSlug || `cat-${Date.now()}`
+                });
+            }
+            categoryId = catDoc._id;
         }
 
         // Auto generate slug if not provided
@@ -81,7 +108,7 @@ const createProduct = async (req, res) => {
             price: Number(price),
             originalPrice: originalPrice ? Number(originalPrice) : undefined,
             discount: discount ? Number(discount) : 0,
-            category,
+            category: categoryId,
             brand: brand || "Generic",
             sku,
             images: formattedImages,
@@ -156,7 +183,21 @@ const getProducts = async (req, res) => {
 
         // Category
         if (category) {
-            filter.category = category;
+            if (mongoose.Types.ObjectId.isValid(category)) {
+                filter.category = category;
+            } else {
+                const catDoc = await Category.findOne({
+                    $or: [
+                        { name: new RegExp(`^${category}$`, "i") },
+                        { slug: new RegExp(`^${category}$`, "i") }
+                    ]
+                });
+                if (catDoc) {
+                    filter.category = catDoc._id;
+                } else {
+                    filter.category = new mongoose.Types.ObjectId();
+                }
+            }
         }
 
         // Brand

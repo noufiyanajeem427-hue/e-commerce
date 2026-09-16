@@ -114,8 +114,8 @@ const orderSchema = new mongoose.Schema(
 
         paymentMethod: {
             type: String,
-            enum: ["COD", "ONLINE"],
-            required: true
+            enum: ["COD", "ONLINE", "UPI", "CARD", "NET_BANKING", "WALLET", "cod", "online", "upi", "card", "net_banking", "netbanking", "wallet"],
+            default: "COD"
         },
 
         paymentStatus: {

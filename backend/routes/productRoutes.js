@@ -32,6 +32,9 @@ router.put("/:id", protect, updateProduct);
 // Toggle product active status - login required
 router.patch("/:id/toggle", protect, toggleProductStatus);
 router.put("/:id/toggle", protect, toggleProductStatus);
+router.patch("/:id/toggle-status", protect, toggleProductStatus);
+router.put("/:id/toggle-status", protect, toggleProductStatus);
+router.patch("/:id/status", protect, toggleProductStatus);
 
 // Delete product - login required
 router.delete("/:id", protect, deleteProduct);

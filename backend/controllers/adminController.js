@@ -111,8 +111,8 @@ const getDashboardStats = async (req, res) => {
             Product.countDocuments(),
             Order.countDocuments(),
             Order.aggregate([
-                { $match: { status: { $ne: "cancelled" } } },
-                { $group: { _id: null, totalRevenue: { $sum: "$total" } } }
+                { $match: { $and: [{ orderStatus: { $ne: "cancelled" } }, { status: { $ne: "cancelled" } }] } },
+                { $group: { _id: null, totalRevenue: { $sum: { $ifNull: ["$totalAmount", { $ifNull: ["$total", 0] }] } } } }
             ]),
             Order.find()
                 .populate("user", "name email")
@@ -124,14 +124,18 @@ const getDashboardStats = async (req, res) => {
         const totalRevenue = revenueAggregation[0]?.totalRevenue || 0;
         const totalCustomers = totalUsers > 0 ? totalUsers : await User.countDocuments();
 
-        const recentOrders = recentOrdersRaw.map((o) => ({
-            id: o._id.toString(),
-            customer: o.user?.name || o.shippingAddress?.fullName || "Guest Customer",
-            amount: o.total,
-            status: o.status.charAt(0).toUpperCase() + o.status.slice(1),
-            itemsCount: o.items.length,
-            createdAt: o.createdAt
-        }));
+        const recentOrders = recentOrdersRaw.map((o) => {
+            const st = String(o.orderStatus || o.status || "pending");
+            return {
+                id: o._id.toString(),
+                orderNumber: o.orderNumber || `ORD-${o._id.toString().slice(-6)}`,
+                customer: o.user?.name || o.shippingAddress?.fullName || "Guest Customer",
+                amount: o.totalAmount || o.total || 0,
+                status: st.charAt(0).toUpperCase() + st.slice(1),
+                itemsCount: o.items?.length || 0,
+                createdAt: o.createdAt
+            };
+        });
 
         const statsData = {
             totalRevenue,
@@ -147,6 +151,7 @@ const getDashboardStats = async (req, res) => {
 
         res.status(200).json({
             success: true,
+            ...statsData,
             stats: statsData,
             data: statsData
         });

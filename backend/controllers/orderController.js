@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const Order = require("../models/Order");
 const Cart = require("../models/Cart");
 const Product = require("../models/Product");
@@ -48,8 +49,13 @@ const createOrder = async (req, res) => {
                 const qty = item.quantity || 1;
                 calculatedSubtotal += unitPrice * qty;
 
+                const itemTitle = prod ? prod.name : (item.name || item.title || "Product Item");
+                const itemImg = prod?.images?.[0]?.url || item.image || item.img || "";
+
                 orderItems.push({
-                    product: prod ? prod._id : (typeof prodId === "string" && prodId.match(/^[0-9a-fA-F]{24}$/) ? prodId : undefined),
+                    product: prod ? prod._id : (typeof prodId === "string" && prodId.match(/^[0-9a-fA-F]{24}$/) ? prodId : new mongoose.Types.ObjectId()),
+                    name: itemTitle,
+                    image: itemImg,
                     quantity: qty,
                     price: unitPrice,
                     variant: item.variant || (item.selectedSize ? `${item.selectedSize}/${item.selectedColor || "Default"}` : undefined)
@@ -109,16 +115,36 @@ const createOrder = async (req, res) => {
         const discount = bodyDiscount !== undefined ? Number(bodyDiscount) : 0;
         const total = bodyTotal !== undefined ? Number(bodyTotal) : (subtotal + shippingCost + tax - discount);
 
+        const normalizedAddress = typeof shippingAddress === "object" ? {
+            fullName: shippingAddress.fullName || req.user?.name || "Customer",
+            phone: shippingAddress.phone || "9999999999",
+            street: shippingAddress.street || shippingAddress.address || "Street Address",
+            city: shippingAddress.city || "City",
+            state: shippingAddress.state || "State",
+            pincode: shippingAddress.pincode || shippingAddress.zip || "100001",
+            country: shippingAddress.country || "India"
+        } : {
+            fullName: req.user?.name || "Customer",
+            phone: "9999999999",
+            street: String(shippingAddress),
+            city: "City",
+            state: "State",
+            pincode: "100001",
+            country: "India"
+        };
+
         const order = await Order.create({
-            user: req.user ? req.user._id : undefined,
+            orderNumber: `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+            user: req.user ? req.user._id : new mongoose.Types.ObjectId(),
             items: orderItems,
-            shippingAddress: typeof shippingAddress === "object" ? shippingAddress : { street: String(shippingAddress) },
-            paymentMethod,
+            shippingAddress: normalizedAddress,
+            paymentMethod: (paymentMethod || "COD").toUpperCase(),
             subtotal,
-            shippingCost,
-            tax,
-            total,
-            status: "pending"
+            shippingCharge: shippingCost,
+            taxAmount: tax,
+            discountAmount: discount,
+            totalAmount: total,
+            orderStatus: "pending"
         });
 
         const createdOrder = await Order.findById(order._id)

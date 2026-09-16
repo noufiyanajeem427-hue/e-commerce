@@ -15,7 +15,7 @@ try {
 // =========================
 // CHATBOT ASSISTANT ENDPOINT
 // =========================
-router.post("/", async (req, res) => {
+const handleChat = async (req, res) => {
   try {
     const { message } = req.body;
 
@@ -155,6 +155,9 @@ Guidelines:
       reply: "I'm having a little trouble fetching catalog data right now. Please feel free to explore our collection!"
     });
   }
-});
+};
+
+router.post("/", handleChat);
+router.post("/send", handleChat);
 
 module.exports = router;
