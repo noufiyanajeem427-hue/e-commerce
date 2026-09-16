@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState, use } from "react";
+import React, { useState, useEffect, use, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Providers } from "../../../components/Providers";
 import { Header } from "../../../components/Header";
 import { Footer } from "../../../components/Footer";
 import { useShop } from "../../../context/ShopContext";
+import { useAuth } from "../../../context/AuthContext";
 import { getProductByIdOrSlug, getAllProducts } from "../../../data/products";
 import {
   Star,
@@ -23,6 +24,11 @@ import {
   ArrowLeft,
   Share2,
   Lock,
+  MessageSquarePlus,
+  PenLine,
+  CheckCircle2,
+  X,
+  User as UserIcon,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -30,16 +36,100 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
+interface ProductReviewItem {
+  id: string;
+  author: string;
+  rating: number;
+  date: string;
+  title: string;
+  comment: string;
+  verified: boolean;
+}
+
 function ProductDetailContent({ id }: { id: string }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const product = getProductByIdOrSlug(id);
   const { addToCart, toggleWishlist, isInWishlist, formatPrice, setIsCartOpen } = useShop();
+  const { user } = useAuth();
+
+  const paramSize = searchParams.get("size");
+  const paramColor = searchParams.get("color");
+  const paramQty = searchParams.get("quantity") || searchParams.get("qty");
 
   const [selectedImage, setSelectedImage] = useState<string>(product?.image || "");
-  const [selectedColor, setSelectedColor] = useState<string>(product?.colors?.[0] || "Default");
-  const [selectedSize, setSelectedSize] = useState<string>(product?.sizes?.[0] || "M");
-  const [quantity, setQuantity] = useState<number>(1);
+  const [selectedColor, setSelectedColor] = useState<string>(
+    paramColor || product?.colors?.[0] || "Default"
+  );
+  const [selectedSize, setSelectedSize] = useState<string>(
+    paramSize || product?.sizes?.[0] || "M"
+  );
+  const [quantity, setQuantity] = useState<number>(
+    paramQty ? Math.max(1, parseInt(paramQty, 10) || 1) : 1
+  );
   const [activeTab, setActiveTab] = useState<"overview" | "specs" | "reviews">("overview");
+
+  // Reviews state & modal
+  const [reviews, setReviews] = useState<ProductReviewItem[]>([]);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [newRating, setNewRating] = useState(5);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [newAuthor, setNewAuthor] = useState("");
+  const [newTitle, setNewTitle] = useState("");
+  const [newComment, setNewComment] = useState("");
+
+  // Load reviews from localStorage
+  useEffect(() => {
+    if (!product) return;
+    const storageKey = `cartiva_product_reviews_${product.id}`;
+    const stored = localStorage.getItem(storageKey);
+    if (stored) {
+      try {
+        setReviews(JSON.parse(stored));
+        return;
+      } catch (e) {
+        // use fallback
+      }
+    }
+    const initialReviews: ProductReviewItem[] = [
+      {
+        id: `rev-1-${product.id}`,
+        author: "Alexander Vance",
+        rating: 5,
+        date: "September 8, 2026",
+        title: "Bespoke craftsmanship and peerless feel",
+        comment: `The ${product.name} far exceeded my expectations. Outstanding fit and finish, premium luxury packaging, and prompt shipping.`,
+        verified: true,
+      },
+      {
+        id: `rev-2-${product.id}`,
+        author: "Sophia Chen",
+        rating: 5,
+        date: "August 24, 2026",
+        title: "Stunning aesthetic and superior build quality",
+        comment: "Flawless in every detail. Will definitely be purchasing more from this curated collection.",
+        verified: true,
+      },
+    ];
+    setReviews(initialReviews);
+    localStorage.setItem(storageKey, JSON.stringify(initialReviews));
+  }, [product?.id]);
+
+  // Prefill author name if user logs in
+  useEffect(() => {
+    if (user?.name && !newAuthor) {
+      setNewAuthor(user.name);
+    }
+  }, [user?.name]);
+
+  useEffect(() => {
+    if (paramSize) setSelectedSize(paramSize);
+    if (paramColor) setSelectedColor(paramColor);
+    if (paramQty) {
+      const q = parseInt(paramQty, 10);
+      if (!isNaN(q) && q > 0) setQuantity(q);
+    }
+  }, [paramSize, paramColor, paramQty]);
 
   if (!product) {
     return (
@@ -67,8 +157,21 @@ function ProductDetailContent({ id }: { id: string }) {
     .filter((p) => p.id !== product.id && p.category === product.category)
     .slice(0, 4);
 
+  const getProductRedirectUrl = () => {
+    const params = new URLSearchParams();
+    if (selectedSize) params.set("size", selectedSize);
+    if (selectedColor) params.set("color", selectedColor);
+    if (quantity > 1) params.set("qty", quantity.toString());
+    const query = params.toString();
+    return `/product/${product.id}${query ? `?${query}` : ""}`;
+  };
+
   const handleAddToCart = () => {
-    addToCart(product, quantity, selectedSize, selectedColor);
+    addToCart(product, quantity, selectedSize, selectedColor, getProductRedirectUrl());
+  };
+
+  const handleToggleWishlist = () => {
+    toggleWishlist(product, getProductRedirectUrl());
   };
 
   const handleBuyNow = () => {
@@ -131,7 +234,7 @@ function ProductDetailContent({ id }: { id: string }) {
             {/* Wishlist & Share floating actions */}
             <div className="absolute top-4 right-4 flex flex-col gap-2 z-10">
               <button
-                onClick={() => toggleWishlist(product)}
+                onClick={handleToggleWishlist}
                 aria-label="Wishlist"
                 className={`p-3 rounded-2xl backdrop-blur-md border transition shadow-lg ${isWish
                   ? "bg-rose-500/90 text-white border-rose-400 shadow-rose-500/30"
@@ -336,84 +439,322 @@ function ProductDetailContent({ id }: { id: string }) {
         </div>
       </div>
 
-      {/* Tabs Section: Overview, Specs, Reviews */}
-      <div className="mt-16 border-t border-zinc-800 pt-10">
-        <div className="flex gap-4 border-b border-zinc-800/80 pb-4">
-          {[
-            { id: "overview", label: "Overview & Features" },
-            { id: "specs", label: "Specifications" },
-            { id: "reviews", label: `Reviews (${product.reviewsCount})` },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`pb-2 px-2 text-sm font-bold transition border-b-2 ${activeTab === tab.id
-                ? "text-amber-400 border-amber-400"
-                : "text-zinc-500 border-transparent hover:text-zinc-300"
+        {/* Tabs Section: Overview, Specs, Reviews */}
+        <div className="mt-16 border-t border-zinc-800 pt-10">
+          <div className="flex gap-4 border-b border-zinc-800/80 pb-4">
+            {[
+              { id: "overview", label: "Overview & Features" },
+              { id: "specs", label: "Specifications" },
+              { id: "reviews", label: `Reviews (${reviews.length})` },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`pb-2 px-2 text-sm font-bold transition border-b-2 cursor-pointer ${
+                  activeTab === tab.id
+                    ? "text-amber-400 border-amber-400"
+                    : "text-zinc-500 border-transparent hover:text-zinc-300"
                 }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
 
-        <div className="py-6">
-          {activeTab === "overview" && (
-            <div className="space-y-4 text-zinc-300 text-sm leading-relaxed max-w-3xl">
-              <p>{product.description}</p>
-              <p>
-                Crafted with precision engineering and high-grade materials to deliver an ultra-premium
-                experience. Backed by full brand warranty and hassle-free returns.
-              </p>
-              <ul className="list-disc list-inside space-y-1.5 text-zinc-400 pt-2">
-                <li>Factory calibrated and inspected for peak durability</li>
-                <li>Ergonomic, modern styling suited for everyday elegance</li>
-                <li>Certified eco-friendly packaging and conscious logistics</li>
-              </ul>
-            </div>
-          )}
+          <div className="py-6">
+            {activeTab === "overview" && (
+              <div className="space-y-4 text-zinc-300 text-sm leading-relaxed max-w-3xl">
+                <p>{product.description}</p>
+                <p>
+                  Crafted with precision engineering and high-grade materials to deliver an ultra-premium
+                  experience. Backed by full brand warranty and hassle-free returns.
+                </p>
+                <ul className="list-disc list-inside space-y-1.5 text-zinc-400 pt-2">
+                  <li>Factory calibrated and inspected for peak durability</li>
+                  <li>Ergonomic, modern styling suited for everyday elegance</li>
+                  <li>Certified eco-friendly packaging and conscious logistics</li>
+                </ul>
+              </div>
+            )}
 
-          {activeTab === "specs" && (
-            <div className="max-w-2xl">
-              <dl className="divide-y divide-zinc-800/80 text-sm">
-                <div className="py-3 grid grid-cols-3 gap-4">
-                  <dt className="text-zinc-500 font-medium">Category</dt>
-                  <dd className="text-zinc-200 col-span-2">{product.category}</dd>
-                </div>
-                <div className="py-3 grid grid-cols-3 gap-4">
-                  <dt className="text-zinc-500 font-medium">Model ID</dt>
-                  <dd className="text-zinc-200 col-span-2">{product.id.toUpperCase()}</dd>
-                </div>
-                <div className="py-3 grid grid-cols-3 gap-4">
-                  <dt className="text-zinc-500 font-medium">Delivery Speed</dt>
-                  <dd className="text-zinc-200 col-span-2">
-                    {product.deliveryEst || "2-4 Business Days"}
-                  </dd>
-                </div>
-                <div className="py-3 grid grid-cols-3 gap-4">
-                  <dt className="text-zinc-500 font-medium">Availability</dt>
-                  <dd className="text-emerald-400 font-semibold col-span-2">In Stock</dd>
-                </div>
-              </dl>
-            </div>
-          )}
+            {activeTab === "specs" && (
+              <div className="max-w-2xl">
+                <dl className="divide-y divide-zinc-800/80 text-sm">
+                  <div className="py-3 grid grid-cols-3 gap-4">
+                    <dt className="text-zinc-500 font-medium">Category</dt>
+                    <dd className="text-zinc-200 col-span-2">{product.category}</dd>
+                  </div>
+                  <div className="py-3 grid grid-cols-3 gap-4">
+                    <dt className="text-zinc-500 font-medium">Model ID</dt>
+                    <dd className="text-zinc-200 col-span-2">{product.id.toUpperCase()}</dd>
+                  </div>
+                  <div className="py-3 grid grid-cols-3 gap-4">
+                    <dt className="text-zinc-500 font-medium">Delivery Speed</dt>
+                    <dd className="text-zinc-200 col-span-2">
+                      {product.deliveryEst || "2-4 Business Days"}
+                    </dd>
+                  </div>
+                  <div className="py-3 grid grid-cols-3 gap-4">
+                    <dt className="text-zinc-500 font-medium">Availability</dt>
+                    <dd className="text-emerald-400 font-semibold col-span-2">In Stock</dd>
+                  </div>
+                </dl>
+              </div>
+            )}
 
-          {activeTab === "reviews" && (
-            <div className="space-y-4 max-w-2xl">
-              <div className="flex items-center gap-4 p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800">
-                <div className="text-center pr-4 border-r border-zinc-800">
-                  <div className="text-3xl font-black text-amber-400">{product.rating}</div>
-                  <div className="text-xs text-zinc-500">out of 5</div>
+            {activeTab === "reviews" && (
+              <div className="space-y-6 max-w-3xl">
+                {/* Aggregate Summary Header */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-3xl bg-zinc-900/60 border border-zinc-800">
+                  <div className="flex items-center gap-4">
+                    <div className="text-center pr-4 border-r border-zinc-800">
+                      <div className="text-3xl font-black text-amber-400">
+                        {reviews.length > 0
+                          ? (
+                              reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length
+                            ).toFixed(1)
+                          : product.rating}
+                      </div>
+                      <div className="flex items-center justify-center gap-0.5 mt-1">
+                        {[1, 2, 3, 4, 5].map((s) => (
+                          <Star key={s} className="w-3 h-3 fill-amber-400 text-amber-400" />
+                        ))}
+                      </div>
+                      <div className="text-[10px] text-zinc-500 mt-1">
+                        {reviews.length} verified ratings
+                      </div>
+                    </div>
+                    <div className="text-xs text-zinc-400">
+                      <p className="font-bold text-white text-sm">Customer Satisfaction (98%)</p>
+                      <p className="mt-0.5">
+                        Based on verified customer submissions for quality, fit, and elegance.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Write a Review Button */}
+                  <button
+                    onClick={() => setIsReviewModalOpen(true)}
+                    className="px-4 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs rounded-xl shadow-md glow-gold flex items-center justify-center gap-2 transition cursor-pointer self-start sm:self-auto shrink-0"
+                  >
+                    <PenLine className="w-4 h-4 text-slate-950" /> Write a Review
+                  </button>
                 </div>
-                <div className="text-xs text-zinc-400">
-                  <p className="font-semibold text-white">Top Rated by Shoppers</p>
-                  <p>Over 98% of customers recommended this product for quality and style.</p>
+
+                {/* Reviews List */}
+                <div className="space-y-3.5">
+                  {reviews.map((rev) => (
+                    <div
+                      key={rev.id}
+                      className="p-5 rounded-2xl bg-zinc-900/40 border border-zinc-800/80 space-y-2.5 transition hover:border-zinc-700"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-slate-950">
+                            {rev.author.charAt(0).toUpperCase()}
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-white text-xs">{rev.author}</span>
+                              {rev.verified && (
+                                <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
+                                  <CheckCircle2 className="w-3 h-3" /> Verified Buyer
+                                </span>
+                              )}
+                            </div>
+                            <span className="text-[10px] text-zinc-500">{rev.date}</span>
+                          </div>
+                        </div>
+
+                        {/* Rating Stars */}
+                        <div className="flex items-center gap-0.5">
+                          {[1, 2, 3, 4, 5].map((s) => (
+                            <Star
+                              key={s}
+                              className={`w-3.5 h-3.5 ${
+                                s <= rev.rating
+                                  ? "fill-amber-400 text-amber-400"
+                                  : "text-zinc-700"
+                              }`}
+                            />
+                          ))}
+                        </div>
+                      </div>
+
+                      {rev.title && (
+                        <h4 className="text-xs font-bold text-zinc-100">{rev.title}</h4>
+                      )}
+
+                      <p className="text-xs text-zinc-300 leading-relaxed">{rev.comment}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
-      </div>
+
+        {/* Write a Review Modal */}
+        {isReviewModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+            <div
+              className="relative w-full max-w-lg bg-zinc-900 border border-zinc-800 rounded-3xl p-6 sm:p-8 shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between border-b border-zinc-800 pb-4 mb-4">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-amber-400/10 border border-amber-400/30 text-amber-400 flex items-center justify-center">
+                    <PenLine className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-white">Write a Customer Review</h3>
+                    <p className="text-xs text-zinc-400 truncate max-w-[260px] sm:max-w-none">
+                      {product.name}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setIsReviewModalOpen(false)}
+                  className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition cursor-pointer"
+                  aria-label="Close"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (!newAuthor.trim() || !newComment.trim()) {
+                    toast.error("Please provide your name and review text");
+                    return;
+                  }
+                  const newReviewItem: ProductReviewItem = {
+                    id: `rev-${Date.now()}`,
+                    author: newAuthor.trim(),
+                    rating: newRating,
+                    date: "Just now",
+                    title: newTitle.trim() || "Verified Customer Review",
+                    comment: newComment.trim(),
+                    verified: true,
+                  };
+                  const updated = [newReviewItem, ...reviews];
+                  setReviews(updated);
+                  if (product) {
+                    localStorage.setItem(
+                      `cartiva_product_reviews_${product.id}`,
+                      JSON.stringify(updated)
+                    );
+                  }
+                  toast.success("Thank you! Your review has been published.");
+                  setIsReviewModalOpen(false);
+                  setNewTitle("");
+                  setNewComment("");
+                }}
+                className="space-y-4 overflow-y-auto pr-1 text-xs"
+              >
+                {/* Rating Selection */}
+                <div className="space-y-1.5">
+                  <label className="font-semibold text-zinc-300">Overall Rating</label>
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          type="button"
+                          onMouseEnter={() => setHoverRating(star)}
+                          onMouseLeave={() => setHoverRating(0)}
+                          onClick={() => setNewRating(star)}
+                          className="p-1 text-zinc-600 hover:scale-110 transition cursor-pointer"
+                        >
+                          <Star
+                            className={`w-6 h-6 ${
+                              star <= (hoverRating || newRating)
+                                ? "fill-amber-400 text-amber-400"
+                                : "text-zinc-700"
+                            }`}
+                          />
+                        </button>
+                      ))}
+                    </div>
+                    <span className="text-xs font-bold text-amber-400 ml-2">
+                      {hoverRating === 1 || (!hoverRating && newRating === 1)
+                        ? "1 - Poor"
+                        : hoverRating === 2 || (!hoverRating && newRating === 2)
+                        ? "2 - Fair"
+                        : hoverRating === 3 || (!hoverRating && newRating === 3)
+                        ? "3 - Good"
+                        : hoverRating === 4 || (!hoverRating && newRating === 4)
+                        ? "4 - Very Good"
+                        : "5 - Exceptional"}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Author Name */}
+                <div className="space-y-1.5">
+                  <label className="font-semibold text-zinc-300">Your Full Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={newAuthor}
+                    onChange={(e) => setNewAuthor(e.target.value)}
+                    placeholder="e.g. Alexander Vance"
+                    className="w-full bg-zinc-950/80 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-zinc-500 outline-none focus:border-amber-400"
+                  />
+                </div>
+
+                {/* Headline / Title */}
+                <div className="space-y-1.5">
+                  <label className="font-semibold text-zinc-300">Review Headline</label>
+                  <input
+                    type="text"
+                    value={newTitle}
+                    onChange={(e) => setNewTitle(e.target.value)}
+                    placeholder="e.g. Masterpiece design and ultra-comfortable"
+                    className="w-full bg-zinc-950/80 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-zinc-500 outline-none focus:border-amber-400"
+                  />
+                </div>
+
+                {/* Review Description */}
+                <div className="space-y-1.5">
+                  <label className="font-semibold text-zinc-300">Detailed Feedback</label>
+                  <textarea
+                    required
+                    rows={4}
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    placeholder="Describe what you liked about the craftsmanship, aesthetics, and delivery experience..."
+                    className="w-full bg-zinc-950/80 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-zinc-500 outline-none focus:border-amber-400 resize-none"
+                  />
+                </div>
+
+                {/* Trust badge note */}
+                <div className="p-3 bg-zinc-950/60 border border-zinc-800 rounded-xl text-[11px] text-zinc-400 flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>Your submission will be tagged as a Verified Customer Review.</span>
+                </div>
+
+                {/* Actions */}
+                <div className="border-t border-zinc-800 pt-4 flex items-center justify-end gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setIsReviewModalOpen(false)}
+                    className="px-4 py-2 text-zinc-400 hover:text-white rounded-xl transition cursor-pointer font-semibold text-xs"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-5 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs rounded-xl shadow-lg glow-gold transition cursor-pointer flex items-center gap-1.5"
+                  >
+                    <Check className="w-4 h-4" /> Submit Review
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
 
       {/* Related Products Grid */}
       {relatedProducts.length > 0 && (
@@ -463,7 +804,9 @@ export default function ProductDetailPage({ params }: PageProps) {
       <div className="min-h-screen bg-[#090D16] text-slate-100 font-sans selection:bg-amber-500 selection:text-slate-950 flex flex-col justify-between">
         <Header />
         <main className="flex-1">
-          <ProductDetailContent id={resolvedParams.id} />
+          <Suspense fallback={<div className="min-h-[70vh] flex items-center justify-center text-white">Loading product details...</div>}>
+            <ProductDetailContent id={resolvedParams.id} />
+          </Suspense>
         </main>
         <Footer />
       </div>

@@ -298,7 +298,7 @@ function LoginForm() {
               <div className="pt-2 text-center text-xs text-zinc-400">
                 Don't have a Cartiva account?{" "}
                 <Link
-                  href="/register"
+                  href={redirectUrl && redirectUrl !== "/" ? `/register?redirect=${encodeURIComponent(redirectUrl)}` : "/register"}
                   className="font-bold text-amber-400 hover:text-amber-300 transition underline underline-offset-4"
                 >
                   Create an account
