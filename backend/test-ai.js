@@ -1,16 +1,16 @@
-require('dotenv').config();
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+require("dotenv").config();
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 async function test() {
-  console.log("Checking API Key:", process.env.GEMINI_API_KEY ? "EXISTS" : "MISSING");
+  console.log("Checking GEMINI_API_KEY:", process.env.GEMINI_API_KEY ? "EXISTS" : "MISSING");
   
   if (!process.env.GEMINI_API_KEY) {
-    console.log("❌ Please add GEMINI_API_KEY to your .env file.");
+    console.log("❌ Please add GEMINI_API_KEY to your backend/.env file.");
     return;
   }
 
-  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY.trim().replace(/^["']|["']$/g, ''));
-  const modelName = 'gemini-1.5-flash';
+  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY.trim().replace(/^["']|["']$/g, ""));
+  const modelName = "gemini-1.5-flash";
   
   try {
     console.log(`Testing model: ${modelName}...`);
