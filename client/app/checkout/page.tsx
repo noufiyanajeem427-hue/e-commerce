@@ -310,7 +310,7 @@ function CheckoutContent() {
     };
 
     // Save order
-    const created = createOrder({
+    const created = await createOrder({
       items: checkoutItems,
       subtotal: rawSubtotalUSD,
       discount: discountAmountUSD,

@@ -32,12 +32,13 @@ const Products = () => {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const response = await API.get(`/products?page=${pagination.page}&limit=${pagination.limit}&search=${search}`);
-      setProducts(response.data.data);
+      const response = await API.get(`/products?page=${pagination.page}&limit=${pagination.limit}&search=${encodeURIComponent(search)}&all=true`);
+      const prods = response.data.products || response.data.data || [];
+      setProducts(Array.isArray(prods) ? prods : []);
       setPagination({
         ...pagination,
-        total: response.data.pagination?.total || 0,
-        pages: response.data.pagination?.pages || 0,
+        total: response.data.pagination?.total || (Array.isArray(prods) ? prods.length : 0),
+        pages: response.data.pagination?.pages || 1,
       });
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -138,18 +139,25 @@ const Products = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {products.map((product) => (
-                    <tr key={product._id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                  {products.map((product) => {
+                    const imgUrl = (product.images && product.images[0]?.url) || 
+                                   (product.images && typeof product.images[0] === 'string' ? product.images[0] : null) || 
+                                   product.image;
+                    return (
+                    <tr key={product._id || product.id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-3">
-                          {product.images?.length > 0 ? (
-                            <img src={product.images[0].url} alt={product.name} className="w-10 h-10 rounded-lg object-cover" />
+                          {imgUrl ? (
+                            <img src={imgUrl} alt={product.name} className="w-10 h-10 rounded-lg object-cover" />
                           ) : (
                             <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
                               <Package className="w-5 h-5 text-slate-400" />
                             </div>
                           )}
-                          <span className="font-medium text-slate-700">{product.name}</span>
+                          <div>
+                            <span className="font-medium text-slate-700 block">{product.name}</span>
+                            <span className="text-xs text-slate-400">{product.category?.name || product.category || ''}</span>
+                          </div>
                         </div>
                       </td>
                       <td className="py-3 px-4 text-slate-600">${product.price}</td>
@@ -194,7 +202,8 @@ const Products = () => {
                         </div>
                       </td>
                     </tr>
-                  ))}
+                  );
+                })}
                 </tbody>
               </table>
             </div>

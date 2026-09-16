@@ -8,9 +8,11 @@ export const loginUser = createAsyncThunk(
   async (credentials, { rejectWithValue }) => {
     try {
       const response = await API.post('/auth/login', credentials);
-      const { token, ...user } = response.data.data;
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
+      const resData = response.data;
+      const token = resData.token || resData.data?.token;
+      const user = resData.user || resData.data?.user || (resData.data ? { ...resData.data } : null);
+      if (token) localStorage.setItem('token', token);
+      if (user) localStorage.setItem('user', JSON.stringify(user));
       toast.success('Login successful!');
       return { user, token };
     } catch (error) {
@@ -26,8 +28,13 @@ export const registerUser = createAsyncThunk(
   async (userData, { rejectWithValue }) => {
     try {
       const response = await API.post('/auth/register', userData);
-      toast.success('Registration successful! Please login.');
-      return response.data;
+      const resData = response.data;
+      const token = resData.token || resData.data?.token;
+      const user = resData.user || resData.data?.user;
+      if (token) localStorage.setItem('token', token);
+      if (user) localStorage.setItem('user', JSON.stringify(user));
+      toast.success('Registration successful!');
+      return { user, token, ...resData };
     } catch (error) {
       toast.error(error.response?.data?.message || 'Registration failed');
       return rejectWithValue(error.response?.data);
@@ -41,7 +48,8 @@ export const getMe = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await API.get('/auth/me');
-      return response.data.data;
+      const resData = response.data;
+      return resData.user || resData.data;
     } catch (error) {
       return rejectWithValue(error.response?.data);
     }

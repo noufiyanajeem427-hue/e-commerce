@@ -32,6 +32,9 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 
+import { productApi } from "../../../lib/api";
+import { Product } from "../../../types";
+
 interface PageProps {
   params: Promise<{ id: string }>;
 }
@@ -49,25 +52,65 @@ interface ProductReviewItem {
 function ProductDetailContent({ id }: { id: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const product = getProductByIdOrSlug(id);
-  const { addToCart, toggleWishlist, isInWishlist, formatPrice, setIsCartOpen } = useShop();
+  const staticProduct = getProductByIdOrSlug(id);
+  const { addToCart, toggleWishlist, isInWishlist, formatPrice, setIsCartOpen, liveProducts } = useShop();
   const { user } = useAuth();
+  const [product, setProduct] = useState<Product | undefined>(staticProduct);
 
   const paramSize = searchParams.get("size");
   const paramColor = searchParams.get("color");
   const paramQty = searchParams.get("quantity") || searchParams.get("qty");
 
-  const [selectedImage, setSelectedImage] = useState<string>(product?.image || "");
+  const [selectedImage, setSelectedImage] = useState<string>(staticProduct?.image || "");
   const [selectedColor, setSelectedColor] = useState<string>(
-    paramColor || product?.colors?.[0] || "Default"
+    paramColor || staticProduct?.colors?.[0] || "Default"
   );
   const [selectedSize, setSelectedSize] = useState<string>(
-    paramSize || product?.sizes?.[0] || "M"
+    paramSize || staticProduct?.sizes?.[0] || "M"
   );
   const [quantity, setQuantity] = useState<number>(
     paramQty ? Math.max(1, parseInt(paramQty, 10) || 1) : 1
   );
   const [activeTab, setActiveTab] = useState<"overview" | "specs" | "reviews">("overview");
+
+  useEffect(() => {
+    if (staticProduct) {
+      setProduct(staticProduct);
+      setSelectedImage(staticProduct.image);
+      return;
+    }
+    const liveMatch = liveProducts.find((p) => p.id === id || p.id === decodeURIComponent(id));
+    if (liveMatch) {
+      setProduct(liveMatch);
+      setSelectedImage(liveMatch.image);
+      return;
+    }
+    productApi.getById(id)
+      .then((res) => {
+        const p = res.product || res.data;
+        if (p) {
+          const mapped: Product = {
+            id: p._id || p.id,
+            name: p.name,
+            category: p.category?.name || p.category || "General",
+            price: p.price || 0,
+            originalPrice: p.originalPrice || (p.price ? p.price * 1.2 : 0),
+            rating: p.ratings?.average || 4.8,
+            reviewsCount: p.ratings?.count || 12,
+            image: (p.images && p.images[0]?.url) || (p.images && typeof p.images[0] === "string" ? p.images[0] : "") || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600",
+            description: p.description || "",
+            inStock: (p.stock || 0) > 0,
+            stockLeft: p.stock || 10,
+            discountPercentage: p.discount || 0,
+          };
+          setProduct(mapped);
+          setSelectedImage(mapped.image);
+        }
+      })
+      .catch((err) => {
+        console.warn("Product fetch from backend notice:", err);
+      });
+  }, [id, liveProducts]);
 
   // Reviews state & modal
   const [reviews, setReviews] = useState<ProductReviewItem[]>([]);

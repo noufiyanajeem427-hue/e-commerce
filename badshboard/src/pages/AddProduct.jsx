@@ -42,12 +42,10 @@ const AddProduct = () => {
     setFetchingCategories(true);
     try {
       const response = await API.get('/categories');
-      console.log('Categories response:', response.data);
-      
-      if (response.data.success && response.data.data.length > 0) {
-        setCategories(response.data.data);
+      const catList = response.data.categories || response.data.data || [];
+      if (catList.length > 0) {
+        setCategories(catList);
       } else {
-        // ✅ FIXED: Real ObjectId format use karein
         setCategories([
           { _id: '65f8a1b2c3d4e5f6a7b8c9d0', name: 'Electronics' },
           { _id: '65f8a1b2c3d4e5f6a7b8c9d1', name: 'Fashion' },
@@ -60,7 +58,6 @@ const AddProduct = () => {
       }
     } catch (error) {
       console.error('Error fetching categories:', error);
-      // ✅ FIXED: Real ObjectId format
       setCategories([
         { _id: '65f8a1b2c3d4e5f6a7b8c9d0', name: 'Electronics' },
         { _id: '65f8a1b2c3d4e5f6a7b8c9d1', name: 'Fashion' },
@@ -68,7 +65,6 @@ const AddProduct = () => {
         { _id: '65f8a1b2c3d4e5f6a7b8c9d3', name: 'Books' },
         { _id: '65f8a1b2c3d4e5f6a7b8c9d4', name: 'Sports' },
       ]);
-      toast.error('Could not load categories. Using default categories.');
     } finally {
       setFetchingCategories(false);
     }

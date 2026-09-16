@@ -25,12 +25,20 @@ const Orders = () => {
   }, [statusFilter]);
 
   const fetchOrders = async () => {
+    setLoading(true);
     try {
-      const url = statusFilter ? `/orders?status=${statusFilter}` : '/orders';
-      const response = await API.get(url);
-      setOrders(response.data.data);
+      const url = statusFilter ? `/orders?status=${statusFilter}` : '/orders/all';
+      let response;
+      try {
+        response = await API.get(url);
+      } catch (err) {
+        response = await API.get(statusFilter ? `/orders?status=${statusFilter}` : '/orders');
+      }
+      const ords = response.data.orders || response.data.data || [];
+      setOrders(Array.isArray(ords) ? ords : []);
     } catch (error) {
       console.error('Error fetching orders:', error);
+      toast.error('Failed to fetch orders');
     } finally {
       setLoading(false);
     }
@@ -43,7 +51,7 @@ const Orders = () => {
       fetchOrders();
       if (selectedOrder) {
         const updated = await API.get(`/orders/${orderId}`);
-        setSelectedOrder(updated.data.data);
+        setSelectedOrder(updated.data.order || updated.data.data);
       }
     } catch (error) {
       toast.error('Failed to update order status');
@@ -53,7 +61,7 @@ const Orders = () => {
   const viewOrderDetail = async (orderId) => {
     try {
       const response = await API.get(`/orders/${orderId}`);
-      setSelectedOrder(response.data.data);
+      setSelectedOrder(response.data.order || response.data.data);
       setShowDetail(true);
     } catch (error) {
       toast.error('Failed to fetch order details');

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "./AuthContext";
 import { Product, CartItem, Currency, Order } from "../types";
 import toast, { Toaster } from "react-hot-toast";
+import { orderApi, productApi } from "../lib/api";
 
 const CURRENCY_RATES: Record<Currency, { rate: number; symbol: string }> = {
   USD: { rate: 1.0, symbol: "$" },
@@ -17,6 +18,7 @@ interface ShopContextType {
   cart: CartItem[];
   wishlist: Product[];
   orders: Order[];
+  liveProducts: Product[];
   currency: Currency;
   setCurrency: (c: Currency) => void;
   formatPrice: (amountInUSD: number) => string;
@@ -38,24 +40,26 @@ interface ShopContextType {
   isInWishlist: (productId: string) => boolean;
   totalCartCount: number;
   totalCartPriceUSD: number;
-  createOrder: (orderData: Omit<Order, "id" | "orderDate" | "orderStatus" | "estimatedDelivery">) => Order;
+  createOrder: (orderData: Omit<Order, "id" | "orderDate" | "orderStatus" | "estimatedDelivery">) => Promise<Order>;
   getOrderById: (orderId: string) => Order | undefined;
+  refreshOrders: () => Promise<void>;
 }
 
 const ShopContext = createContext<ShopContextType | undefined>(undefined);
 
 export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const router = useRouter();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const [cart, setCart] = useState<CartItem[]>([]);
   const [wishlist, setWishlist] = useState<Product[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [liveProducts, setLiveProducts] = useState<Product[]>([]);
   const [currency, setCurrency] = useState<Currency>("INR");
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const [isHydrated, setIsHydrated] = useState(false);
 
-  // Load saved state from localStorage on mount
+  // Load saved state from localStorage on mount & fetch live products / orders
   useEffect(() => {
     try {
       const savedCart = localStorage.getItem("luxe_cart");
@@ -78,7 +82,107 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } finally {
       setIsHydrated(true);
     }
+
+    // Fetch live products from backend
+    productApi.getAll({ limit: 50 })
+      .then((res) => {
+        const rawProds = res.products || res.data || [];
+        if (Array.isArray(rawProds) && rawProds.length > 0) {
+          const mapped: Product[] = rawProds.map((p: any) => ({
+            id: p._id || p.id,
+            name: p.name,
+            category: p.category?.name || p.category || "General",
+            price: p.price || 0,
+            originalPrice: p.originalPrice || (p.price ? p.price * 1.2 : 0),
+            rating: p.ratings?.average || 4.8,
+            reviewsCount: p.ratings?.count || 12,
+            image: (p.images && p.images[0]?.url) || (p.images && typeof p.images[0] === "string" ? p.images[0] : "") || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600",
+            description: p.description || "",
+            inStock: (p.stock || 0) > 0,
+            stockLeft: p.stock || 10,
+            discountPercentage: p.discount || 0,
+          }));
+          setLiveProducts(mapped);
+        }
+      })
+      .catch((err) => {
+        console.warn("Could not fetch live backend products:", err);
+      });
   }, []);
+
+  // Fetch backend orders when user is authenticated
+  const refreshOrders = async () => {
+    if (!isAuthenticated) return;
+    try {
+      const res = await orderApi.getMyOrders();
+      const backendOrders = res.orders || res.data || [];
+      if (Array.isArray(backendOrders) && backendOrders.length > 0) {
+        const mappedOrders: Order[] = backendOrders.map((o: any) => ({
+          id: o._id || o.id,
+          items: (o.items || []).map((it: any) => ({
+            product: it.product ? {
+              id: it.product._id || it.product.id || "item_01",
+              name: it.product.name || "Product",
+              category: "General",
+              price: it.price || it.product.price || 0,
+              originalPrice: (it.price || it.product.price || 0) * 1.2,
+              rating: 5,
+              reviewsCount: 1,
+              image: (it.product.images && it.product.images[0]?.url) || (it.product.images && typeof it.product.images[0] === "string" ? it.product.images[0] : "") || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600",
+              description: "",
+              inStock: true
+            } : {
+              id: "item_01",
+              name: "Product Item",
+              category: "General",
+              price: it.price || 0,
+              originalPrice: (it.price || 0) * 1.2,
+              rating: 5,
+              reviewsCount: 1,
+              image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600",
+              description: "",
+              inStock: true
+            },
+            quantity: it.quantity || 1,
+            priceAtPurchase: it.price || 0
+          })),
+          subtotal: o.subtotal || 0,
+          discount: o.discount || 0,
+          shippingFee: o.shippingCost || 0,
+          totalAmount: o.total || 0,
+          currency: "INR",
+          shippingAddress: {
+            fullName: o.shippingAddress?.fullName || user?.name || "Customer",
+            phone: o.shippingAddress?.phone || "",
+            email: o.shippingAddress?.email || user?.email || "",
+            streetAddress: o.shippingAddress?.streetAddress || o.shippingAddress?.street || "",
+            city: o.shippingAddress?.city || "",
+            state: o.shippingAddress?.state || "",
+            pinCode: o.shippingAddress?.pinCode || "",
+          },
+          paymentMethod: (o.paymentMethod as any) || "upi",
+          paymentDetails: {
+            transactionId: `TXN-${o._id?.slice(-8) || "0000"}`,
+            paymentStatus: "Completed"
+          },
+          orderStatus: (o.status ? o.status.charAt(0).toUpperCase() + o.status.slice(1) : "Order Placed") as any,
+          orderDate: o.createdAt ? new Date(o.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "Today",
+          estimatedDelivery: "3-5 Business Days"
+        }));
+
+        setOrders(mappedOrders);
+        localStorage.setItem("luxe_orders", JSON.stringify(mappedOrders));
+      }
+    } catch (err) {
+      console.warn("Could not sync backend orders:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      refreshOrders();
+    }
+  }, [isAuthenticated]);
 
   // Sync to localStorage ONLY AFTER hydration is complete
   useEffect(() => {
@@ -188,9 +292,9 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setCart([]);
   };
 
-  const createOrder = (
+  const createOrder = async (
     orderData: Omit<Order, "id" | "orderDate" | "orderStatus" | "estimatedDelivery">
-  ): Order => {
+  ): Promise<Order> => {
     const randomDigits = Math.floor(100000 + Math.random() * 900000);
     const orderId = `ORD-${randomDigits}-IN`;
 
@@ -212,13 +316,42 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
       year: "numeric",
     });
 
-    const newOrder: Order = {
+    let newOrder: Order = {
       ...orderData,
       id: orderId,
       orderDate,
       orderStatus: "Order Placed",
       estimatedDelivery,
     };
+
+    // Try posting to backend API
+    try {
+      const payload = {
+        items: orderData.items.map((it) => ({
+          product: it.product.id,
+          quantity: it.quantity,
+          price: it.priceAtPurchase,
+          variant: `${it.selectedSize || "M"}/${it.selectedColor || "Default"}`,
+        })),
+        shippingAddress: orderData.shippingAddress,
+        paymentMethod: orderData.paymentMethod,
+        subtotal: orderData.subtotal,
+        discount: orderData.discount,
+        shippingCost: orderData.shippingFee,
+        total: orderData.totalAmount,
+      };
+
+      const res = await orderApi.create(payload);
+      const createdBackendOrder = res.order || res.data;
+      if (createdBackendOrder?._id) {
+        newOrder = {
+          ...newOrder,
+          id: createdBackendOrder._id,
+        };
+      }
+    } catch (err) {
+      console.warn("Could not save order directly to backend, saved to local cache:", err);
+    }
 
     // Update state
     setOrders((prev) => [newOrder, ...prev]);
@@ -294,6 +427,7 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
         cart,
         wishlist,
         orders,
+        liveProducts,
         currency,
         setCurrency,
         formatPrice,
@@ -311,6 +445,7 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
         totalCartPriceUSD,
         createOrder,
         getOrderById,
+        refreshOrders,
       }}
     >
       <Toaster position="bottom-right" reverseOrder={false} />

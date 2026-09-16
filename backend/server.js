@@ -1,0 +1,73 @@
+const dns = require("dns");
+
+dns.setDefaultResultOrder("ipv4first")
+const express = require("express");
+const dotenv = require("dotenv");
+const cors = require("cors");
+const connectDB = require("./config/db");
+
+dotenv.config();
+
+const app = express();
+
+// =========================
+// DATABASE CONNECTION
+// =========================
+connectDB();
+
+// =========================
+// MIDDLEWARE
+// =========================
+app.use(cors({
+    origin: true, // Allow any origin to reflect automatically, or specific origins
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+}));
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
+
+// =========================
+// ROUTES
+// =========================
+const authRoutes = require("./routes/authRoutes");
+const productRoutes = require("./routes/productRoutes");
+const categoryRoutes = require("./routes/categoryRoutes");
+const cartRoutes = require("./routes/cartRoutes");
+const wishlistRoutes = require("./routes/wishlistRoutes");
+const orderRoutes = require("./routes/orderRoutes");
+const reviewRoutes = require("./routes/reviewRoutes");
+const couponRoutes = require("./routes/couponRoutes");
+const adminRoutes = require("./routes/adminRoutes");
+
+// =========================
+// API ROUTES
+// =========================
+app.use("/api/auth", authRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/categories", categoryRoutes);
+app.use("/api/cart", cartRoutes);
+app.use("/api/wishlist", wishlistRoutes);
+app.use("/api/orders", orderRoutes);
+app.use("/api/reviews", reviewRoutes);
+app.use("/api/coupons", couponRoutes);
+app.use("/api/admin", adminRoutes);
+
+// =========================
+// HOME ROUTE
+// =========================
+app.get("/", (req, res) => {
+    res.json({
+        success: true,
+        message: "Shop Sathi Backend is running!"
+    });
+});
+
+// =========================
+// SERVER
+// =========================
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
